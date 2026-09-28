@@ -170,9 +170,6 @@ jobs:
           import android.webkit.WebViewClient;
 
           import androidx.annotation.Nullable;
-          import androidx.core.graphics.Insets;
-          import androidx.core.view.ViewCompat;
-          import androidx.core.view.WindowInsetsCompat;
           import androidx.webkit.WebViewAssetLoader;
 
           public class MainActivity extends Activity {
@@ -189,11 +186,9 @@ jobs:
                   webView.setBackgroundColor(Color.rgb(238, 243, 248));
                   setContentView(webView);
 
-                  ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
-                      Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                      v.setPadding(0, bars.top, 0, bars.bottom);
-                      return insets;
-                  });
+                  if (android.os.Build.VERSION.SDK_INT >= 30) {
+                      getWindow().setDecorFitsSystemWindows(true);
+                  }
 
                   WebSettings s = webView.getSettings();
                   s.setJavaScriptEnabled(true);
