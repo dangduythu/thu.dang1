@@ -1,0 +1,65 @@
+name: Build Technical Handbook V2 Native Windows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/v2.0-native/**'
+      - '.github/workflows/build-technical-handbook-v2-native-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Decode native Windows source
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force buildsrc | Out-Null
+          $b64 = Get-Content -Raw windows/v2.0-native/payload.b64
+          [IO.File]::WriteAllBytes('buildsrc/source.zip', [Convert]::FromBase64String($b64))
+          Expand-Archive -Path buildsrc/source.zip -DestinationPath buildsrc/unpacked -Force
+          $src = Get-ChildItem buildsrc/unpacked -Directory | Where-Object { $_.Name -eq 'TechnicalHandbook-V2.0-Native-Windows-source' } | Select-Object -First 1
+          if (-not $src) { throw 'Source folder not found' }
+          "SRC=$($src.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Restore
+        shell: pwsh
+        run: dotnet restore "$env:SRC\TechnicalHandbook.Desktop.csproj"
+
+      - name: Publish single EXE
+        shell: pwsh
+        run: |
+          dotnet publish "$env:SRC\TechnicalHandbook.Desktop.csproj" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o publish
+          $exe = 'publish\TechnicalHandbook-V2.0-Windows.exe'
+          if (-not (Test-Path $exe)) { throw "EXE not found: $exe" }
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TechnicalHandbook-V2.0-Native-Windows
+          path: publish/TechnicalHandbook-V2.0-Windows.exe
+
+      - name: Publish GitHub Release
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = 'technical-handbook-v2.0-windows-native'
+          $exe = 'publish\TechnicalHandbook-V2.0-Windows.exe'
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $exe --clobber
+          } else {
+            gh release create $tag $exe --title 'Technical Handbook V2.0 - Native Windows' --notes 'Native Windows desktop build. Opens directly as a desktop application with the existing V2.0 desktop layout. No localhost server, browser window, or console window.'
+          }
