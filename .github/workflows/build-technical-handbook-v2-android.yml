@@ -3,6 +3,8 @@ name: Build Technical Handbook V2 Android APK
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
     paths:
       - 'android/v2.0/**'
       - '.github/workflows/build-technical-handbook-v2-android.yml'
