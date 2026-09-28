@@ -92,6 +92,12 @@ jobs:
           }
           EOF
 
+          cat > androidapp/gradle.properties <<'EOF'
+          android.useAndroidX=true
+          android.enableJetifier=true
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          EOF
+
           cat > androidapp/app/build.gradle <<'EOF'
           plugins {
               id 'com.android.application'
