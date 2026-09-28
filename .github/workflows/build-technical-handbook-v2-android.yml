@@ -159,6 +159,8 @@ jobs:
           package com.technicalhandbook.app;
 
           import android.app.Activity;
+          import android.app.AlertDialog;
+          import android.graphics.Color;
           import android.os.Bundle;
           import android.webkit.WebChromeClient;
           import android.webkit.WebResourceRequest;
@@ -168,6 +170,9 @@ jobs:
           import android.webkit.WebViewClient;
 
           import androidx.annotation.Nullable;
+          import androidx.core.graphics.Insets;
+          import androidx.core.view.ViewCompat;
+          import androidx.core.view.WindowInsetsCompat;
           import androidx.webkit.WebViewAssetLoader;
 
           public class MainActivity extends Activity {
@@ -177,8 +182,18 @@ jobs:
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
+                  getWindow().setStatusBarColor(Color.rgb(18, 59, 93));
+                  getWindow().setNavigationBarColor(Color.rgb(238, 243, 248));
+
                   webView = new WebView(this);
+                  webView.setBackgroundColor(Color.rgb(238, 243, 248));
                   setContentView(webView);
+
+                  ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
+                      Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                      v.setPadding(0, bars.top, 0, bars.bottom);
+                      return insets;
+                  });
 
                   WebSettings s = webView.getSettings();
                   s.setJavaScriptEnabled(true);
@@ -209,12 +224,21 @@ jobs:
                   webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html");
               }
 
+              private void confirmExit() {
+                  new AlertDialog.Builder(this)
+                      .setTitle("Thoát ứng dụng")
+                      .setMessage("Bạn có muốn thoát Technical Handbook không?")
+                      .setNegativeButton("Không", null)
+                      .setPositiveButton("Thoát", (dialog, which) -> finish())
+                      .show();
+              }
+
               @Override
               public void onBackPressed() {
                   if (webView != null && webView.canGoBack()) {
                       webView.goBack();
                   } else {
-                      super.onBackPressed();
+                      confirmExit();
                   }
               }
           }
