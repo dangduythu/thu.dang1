@@ -1,0 +1,47 @@
+name: Build Windows EXE
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'main.go'
+      - 'web/**'
+      - 'assets/**'
+      - '.github/workflows/build-windows.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Verify source files
+        shell: pwsh
+        run: |
+          foreach ($p in @("main.go", "web/index.html", "web/app.js", "assets/articles.json", "assets/troubleshooting.json", "assets/dictionary.json")) {
+            if (-not (Test-Path $p)) { throw "Missing source file: $p" }
+          }
+      - name: Build executable
+        shell: pwsh
+        run: |
+          go build -trimpath -ldflags="-s -w" -o TechnicalHandbook-V1.1-Windows.exe main.go
+          if (-not (Test-Path TechnicalHandbook-V1.1-Windows.exe)) { throw "EXE missing" }
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TechnicalHandbook-V1.1-Windows
+          path: TechnicalHandbook-V1.1-Windows.exe
+      - name: Publish release
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if (gh release view v1.1.0 > $null 2>&1) {
+            gh release upload v1.1.0 TechnicalHandbook-V1.1-Windows.exe --clobber
+          } else {
+            gh release create v1.1.0 TechnicalHandbook-V1.1-Windows.exe --title "Technical Handbook V1.1 (Windows)" --notes "Bản Windows dùng để rà soát nội dung kỹ thuật trước khi phát hành Android."
+          }
