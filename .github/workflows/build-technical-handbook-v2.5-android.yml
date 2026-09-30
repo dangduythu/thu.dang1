@@ -1,0 +1,116 @@
+name: Build Technical Handbook V2.5 Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/v2.5/**'
+      - '.github/workflows/build-technical-handbook-v2.5-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Prepare Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"; fi
+          if [ ! -x "$SDKMANAGER" ]; then echo 'sdkmanager not found'; find "$ANDROID_HOME" -maxdepth 4 -name sdkmanager -type f -print || true; exit 1; fi
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Decode source
+        shell: bash
+        run: |
+          mkdir -p buildsrc
+          base64 -d android/v2.5/payload.b64 > buildsrc/source.zip
+          unzip -q buildsrc/source.zip -d buildsrc/unpacked
+          SRC="$(find buildsrc/unpacked -maxdepth 1 -type d -name 'TechnicalHandbook-V2.5-Mobile-source' | head -1)"
+          test -n "$SRC"
+          echo "SRC=$SRC" >> "$GITHUB_ENV"
+      - name: Generate Android app
+        shell: bash
+        run: |
+          mkdir -p androidapp/app/src/main/java/com/technicalhandbook/app androidapp/app/src/main/assets/www/assets androidapp/app/src/main/res/values
+          cp "$SRC/web/index.html" androidapp/app/src/main/assets/www/index.html
+          cp "$SRC/web/app.js" androidapp/app/src/main/assets/www/app.js
+          cp "$SRC/assets/"*.json androidapp/app/src/main/assets/www/assets/
+          sed -i 's/WINDOWS OFFLINE/ANDROID OFFLINE/g' androidapp/app/src/main/assets/www/index.html
+          cat > androidapp/settings.gradle <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
+          rootProject.name='TechnicalHandbookV25'
+          include ':app'
+          EOF
+          cat > androidapp/build.gradle <<'EOF'
+          plugins { id 'com.android.application' version '8.7.3' apply false }
+          EOF
+          cat > androidapp/gradle.properties <<'EOF'
+          android.useAndroidX=true
+          android.enableJetifier=true
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          EOF
+          cat > androidapp/app/build.gradle <<'EOF'
+          plugins { id 'com.android.application' }
+          dependencies { implementation 'androidx.webkit:webkit:1.12.1' }
+          android {
+            namespace 'com.technicalhandbook.app'
+            compileSdk 35
+            defaultConfig { applicationId 'com.technicalhandbook.app'; minSdk 26; targetSdk 35; versionCode 25; versionName '2.5' }
+          }
+          EOF
+          cat > androidapp/app/src/main/AndroidManifest.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <application android:allowBackup="true" android:label="Technical Handbook" android:theme="@style/AppTheme" android:usesCleartextTraffic="false">
+              <activity android:name=".MainActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:exported="true">
+                <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+              </activity>
+            </application>
+          </manifest>
+          EOF
+          cat > androidapp/app/src/main/res/values/styles.xml <<'EOF'
+          <resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#176A9B</item><item name="android:navigationBarColor">#EEF3F8</item><item name="android:statusBarColor">#123B5D</item><item name="android:windowLightStatusBar">false</item></style></resources>
+          EOF
+          cat > androidapp/app/src/main/java/com/technicalhandbook/app/MainActivity.java <<'EOF'
+          package com.technicalhandbook.app;
+          import android.app.*; import android.graphics.Color; import android.os.*; import android.webkit.*;
+          import androidx.annotation.Nullable; import androidx.webkit.WebViewAssetLoader;
+          public class MainActivity extends Activity {
+            private WebView webView;
+            public void onCreate(Bundle b){ super.onCreate(b); getWindow().setStatusBarColor(Color.rgb(18,59,93)); getWindow().setNavigationBarColor(Color.rgb(238,243,248)); if(Build.VERSION.SDK_INT>=30)getWindow().setDecorFitsSystemWindows(true); webView=new WebView(this); setContentView(webView); WebSettings s=webView.getSettings(); s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true); s.setAllowFileAccess(false); s.setAllowContentAccess(false); s.setTextZoom(100); final WebViewAssetLoader l=new WebViewAssetLoader.Builder().addPathHandler("/assets/",new WebViewAssetLoader.AssetsPathHandler(this)).build(); webView.setWebViewClient(new WebViewClient(){ public @Nullable WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return l.shouldInterceptRequest(r.getUrl());}}); webView.setWebChromeClient(new WebChromeClient()); webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html"); }
+            private void exitConfirm(){ new AlertDialog.Builder(this).setTitle("Thoát ứng dụng").setMessage("Bạn có muốn thoát Technical Handbook không?").setNegativeButton("Không",null).setPositiveButton("Thoát",(d,w)->finish()).show(); }
+            @Override public void onBackPressed(){ if(webView!=null && webView.canGoBack()) webView.goBack(); else exitConfirm(); }
+          }
+          EOF
+      - name: Build APK
+        working-directory: androidapp
+        shell: bash
+        run: |
+          gradle --no-daemon :app:assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../TechnicalHandbook-V2.5-Android.apk
+          test -s ../TechnicalHandbook-V2.5-Android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TechnicalHandbook-V2.5-Android
+          path: TechnicalHandbook-V2.5-Android.apk
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag='technical-handbook-v2.5-android'
+          apk='TechnicalHandbook-V2.5-Android.apk'
+          if gh release view "$tag" >/dev/null 2>&1; then gh release upload "$tag" "$apk" --clobber; else gh release create "$tag" "$apk" --title 'Technical Handbook V2.5 - Android' --notes 'Cumulative V2.1-V2.5 Android build.'; fi
