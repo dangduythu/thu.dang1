@@ -1,0 +1,52 @@
+name: Build Technical Handbook V2.5 Native Windows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/v2.5-native/**'
+      - '.github/workflows/build-technical-handbook-v2.5-native-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Decode source
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force buildsrc | Out-Null
+          $b64 = Get-Content -Raw windows/v2.5-native/payload.b64
+          [IO.File]::WriteAllBytes('buildsrc/source.zip',[Convert]::FromBase64String($b64))
+          Expand-Archive buildsrc/source.zip buildsrc/unpacked -Force
+          $src = Get-ChildItem buildsrc/unpacked -Directory | Where-Object { $_.Name -eq 'TechnicalHandbook-V2.5-Native-Windows-source' } | Select-Object -First 1
+          if (-not $src) { throw 'V2.5 Windows source folder not found' }
+          "SRC=$($src.FullName)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Restore
+        shell: pwsh
+        run: dotnet restore "$env:SRC\TechnicalHandbook.Desktop.csproj"
+      - name: Publish single EXE
+        shell: pwsh
+        run: |
+          dotnet publish "$env:SRC\TechnicalHandbook.Desktop.csproj" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o publish
+          if (-not (Test-Path 'publish\TechnicalHandbook-V2.5-Windows.exe')) { throw 'EXE missing' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TechnicalHandbook-V2.5-Windows
+          path: publish/TechnicalHandbook-V2.5-Windows.exe
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag='technical-handbook-v2.5-windows'
+          $exe='publish\TechnicalHandbook-V2.5-Windows.exe'
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) { gh release upload $tag $exe --clobber } else { gh release create $tag $exe --title 'Technical Handbook V2.5 - Windows' --notes 'Cumulative V2.1-V2.5 native Windows desktop build.' }
