@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from content import CHAPTERS
 
-APP_NAME="Tư Duy Đúng – Book App"; VERSION="1.1.1"; APP_DIR="TuDuyDungBookApp"
+APP_NAME="Tư Duy Đúng – Book App"; VERSION="1.2"; APP_DIR="TuDuyDungBookApp"
 
 def state_path():
     p=Path(os.getenv("APPDATA",Path.home()))/APP_DIR; p.mkdir(parents=True,exist_ok=True); return p/"state.json"
@@ -98,7 +98,13 @@ class App(tk.Tk):
         if CHAPTERS[i]["lessons"]:self.show_lesson(CHAPTERS[i]["lessons"][0]["id"])
     def pick(self,_=None):
         s=self.tree.selection()
-        if s and s[0].startswith("l") and s[0][1:] in self.byid:self.show_lesson(s[0][1:])
+        if not s or not s[0].startswith("l"): return
+        lid=s[0][1:]
+        if lid not in self.byid: return
+        # Prevent recursive TreeviewSelect events when the program itself
+        # refreshes/selects the current lesson.
+        if self.mode=="reader" and lid==self.current: return
+        self.show_lesson(lid)
     def show_lesson(self,lid,add=True):
         if lid not in self.byid:return
         self.show_reader(); self.current=lid; l=self.byid[lid]; self.lid.configure(text=f"BÀI {lid}"); self.ltitle.configure(text=l["title"]); self.lsum.configure(text=l["summary"]); self.bm.set("★ Đã lưu" if lid in self.bookmarks else "☆ Lưu bài"); self.status.set("Đã đọc" if lid in self.read else "Chưa đánh dấu đã đọc")
@@ -109,7 +115,7 @@ class App(tk.Tk):
         if add:
             if self.hpos<len(self.hist)-1:self.hist=self.hist[:self.hpos+1]
             if not self.hist or self.hist[-1]!=lid:self.hist.append(lid); self.hpos=len(self.hist)-1
-        self.save(); self.populate(); self.select(lid)
+        self.save(); self.select(lid)
     def select(self,lid):
         i="l"+lid
         if self.tree.exists(i):self.tree.selection_set(i); self.tree.see(i)
