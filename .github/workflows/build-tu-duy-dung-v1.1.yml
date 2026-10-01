@@ -1,4 +1,4 @@
-name: Build Tu Duy Dung Book App V1.1.1
+name: Build Tu Duy Dung Book App V1.2
 
 on:
   workflow_dispatch:
@@ -32,11 +32,11 @@ jobs:
       - name: Build portable EXE
         working-directory: tu-duy-dung-bookapp
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V1.1.1.1" app.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V1.2" app.py
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_BookApp_V1.1.1.1_Windows
-          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V1.1.1.1.exe
+          name: TuDuyDung_BookApp_V1.2_Windows
+          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V1.2.exe
           if-no-files-found: error
