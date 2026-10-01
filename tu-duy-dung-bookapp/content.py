@@ -1,12 +1,22 @@
-def lesson(i, title, summary, concept, method, example, checklist, blocks, style, why, mistakes, practice, reflect):
+def lesson(i, title, summary, concept, method, example, checklist, blocks, style,
+           why="", mistakes=None, practice="", reflect=None):
     return {
-        "id": i, "title": title, "summary": summary,
-        "concept": concept, "method": method, "example": example,
-        "checklist": checklist, "blocks": blocks, "style": style,
-        "why": why, "mistakes": mistakes, "practice": practice, "reflect": reflect
+        "id": i,
+        "title": title or "",
+        "summary": summary or "",
+        "concept": concept or "",
+        "method": method or "",
+        "example": example or "",
+        "checklist": checklist or [],
+        "blocks": blocks or [],
+        "style": style or "flow",
+        "why": why or "",
+        "mistakes": mistakes or [],
+        "practice": practice or "",
+        "reflect": reflect or [],
     }
 
-def L(i,t,s,c,m,e,b,st,w,mis,p,r):
+def L(i,t,s,c,m,e,b,st,w="",mis=None,p="",r=None):
     return lesson(i,t,s,c,m,e,b,st,w,mis,p,r)
 
 CHAPTERS=[
