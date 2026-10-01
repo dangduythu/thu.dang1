@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from content import CHAPTERS
 
-APP_NAME="Tư Duy Đúng – Book App"; VERSION="1.1"; APP_DIR="TuDuyDungBookApp"
+APP_NAME="Tư Duy Đúng – Book App"; VERSION="1.1.1"; APP_DIR="TuDuyDungBookApp"
 
 def state_path():
     p=Path(os.getenv("APPDATA",Path.home()))/APP_DIR; p.mkdir(parents=True,exist_ok=True); return p/"state.json"
@@ -15,7 +15,7 @@ class App(tk.Tk):
         st=self.load(); self.theme=st.get("theme","light"); self.fs=int(st.get("font_size",13)); self.bookmarks=set(st.get("bookmarks",[])); self.read=set(st.get("read_lessons",[])); self.current=st.get("last_lesson","1.1")
         self.lessons=[l for c in CHAPTERS for l in c["lessons"]]; self.byid={l["id"]:l for l in self.lessons}; self.hist=[]; self.hpos=-1; self.mode="home"
         self.q=tk.StringVar(); self.status=tk.StringVar(); self.bm=tk.StringVar(value="☆ Lưu bài")
-        self.option_add("*Font","Segoe UI 10"); self.style=ttk.Style(self)
+        self.style=ttk.Style(self)
         try:self.style.theme_use("clam")
         except:pass
         self.build(); self.apply_theme(); self.populate(); self.show_home(); self.protocol("WM_DELETE_WINDOW",self.exit_confirm)
