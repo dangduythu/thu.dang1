@@ -5,7 +5,7 @@ from tkinter import ttk, messagebox
 from content import CHAPTERS
 
 APP_NAME="Tư Duy Đúng – Book App"
-VERSION="1.4.1"
+VERSION="1.4.2"
 APP_DIR="TuDuyDungBookApp"
 
 PALETTES={
