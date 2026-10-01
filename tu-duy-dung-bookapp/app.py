@@ -4,141 +4,317 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from content import CHAPTERS
 
-APP_NAME="Tư Duy Đúng – Book App"; VERSION="1.2"; APP_DIR="TuDuyDungBookApp"
+APP_NAME="Tư Duy Đúng – Book App"
+VERSION="1.4"
+APP_DIR="TuDuyDungBookApp"
+
+PALETTES={
+"flow":dict(primary="#2563eb",soft="#dbeafe",accent="#16a34a",accent2="#dcfce7",alt="#f59e0b",alt2="#fef3c7"),
+"steps":dict(primary="#7c3aed",soft="#ede9fe",accent="#0ea5e9",accent2="#e0f2fe",alt="#f97316",alt2="#ffedd5"),
+"matrix":dict(primary="#059669",soft="#d1fae5",accent="#0f766e",accent2="#ccfbf1",alt="#f59e0b",alt2="#fef3c7"),
+"compare":dict(primary="#dc2626",soft="#fee2e2",accent="#2563eb",accent2="#dbeafe",alt="#7c3aed",alt2="#f3e8ff"),
+"ladder":dict(primary="#ea580c",soft="#ffedd5",accent="#2563eb",accent2="#dbeafe",alt="#16a34a",alt2="#dcfce7"),
+"cycle":dict(primary="#0f766e",soft="#ccfbf1",accent="#7c3aed",accent2="#ede9fe",alt="#2563eb",alt2="#dbeafe"),
+}
 
 def state_path():
-    p=Path(os.getenv("APPDATA",Path.home()))/APP_DIR; p.mkdir(parents=True,exist_ok=True); return p/"state.json"
+    p=Path(os.getenv("APPDATA",str(Path.home())))/APP_DIR
+    p.mkdir(parents=True,exist_ok=True)
+    return p/"state.json"
+
+class Scroll(tk.Frame):
+    def __init__(self,master,bg):
+        super().__init__(master,bg=bg)
+        self.canvas=tk.Canvas(self,bg=bg,highlightthickness=0)
+        self.sb=ttk.Scrollbar(self,orient="vertical",command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.sb.set)
+        self.sb.pack(side="right",fill="y"); self.canvas.pack(side="left",fill="both",expand=True)
+        self.inner=tk.Frame(self.canvas,bg=bg)
+        self.win=self.canvas.create_window((0,0),window=self.inner,anchor="nw")
+        self.inner.bind("<Configure>",lambda e:self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.bind("<Configure>",lambda e:self.canvas.itemconfigure(self.win,width=e.width))
+        self.inner.bind("<Enter>",lambda e:self.canvas.bind_all("<MouseWheel>",self._wheel))
+        self.inner.bind("<Leave>",lambda e:self.canvas.unbind_all("<MouseWheel>"))
+    def _wheel(self,e): self.canvas.yview_scroll(int(-e.delta/120),"units")
+    def top(self): self.canvas.yview_moveto(0)
 
 class App(tk.Tk):
     def __init__(self):
-        super().__init__(); self.title(f"{APP_NAME} V{VERSION}"); self.geometry("1260x800"); self.minsize(1020,650)
-        st=self.load(); self.theme=st.get("theme","light"); self.fs=int(st.get("font_size",13)); self.bookmarks=set(st.get("bookmarks",[])); self.read=set(st.get("read_lessons",[])); self.current=st.get("last_lesson","1.1")
-        self.lessons=[l for c in CHAPTERS for l in c["lessons"]]; self.byid={l["id"]:l for l in self.lessons}; self.hist=[]; self.hpos=-1; self.mode="home"
-        self.q=tk.StringVar(); self.status=tk.StringVar(); self.bm=tk.StringVar(value="☆ Lưu bài")
+        super().__init__()
+        self.title(f"{APP_NAME} V{VERSION}")
+        self.geometry("1420x920"); self.minsize(1180,760)
+        self.bg="#edf3fb"; self.panel="#ffffff"; self.text="#14213d"; self.muted="#64748b"; self.line="#d8e3f0"
+        self.configure(bg=self.bg)
+        st=self.load()
+        self.bookmarks=set(st.get("bookmarks",[])); self.read=set(st.get("read_lessons",[]))
+        self.current=st.get("last_lesson","1.1"); self.fs=int(st.get("font_size",12))
+        self.lessons=[l for c in CHAPTERS for l in c["lessons"]]; self.byid={l["id"]:l for l in self.lessons}
+        self.hist=[]; self.hpos=-1; self.block_tree=False
+        self.q=tk.StringVar(); self.bookmark_var=tk.StringVar(); self.progress_var=tk.StringVar()
         self.style=ttk.Style(self)
         try:self.style.theme_use("clam")
         except:pass
-        self.build(); self.apply_theme(); self.populate(); self.show_home(); self.protocol("WM_DELETE_WINDOW",self.exit_confirm)
-        self.bind("<Control-f>",lambda e:self.search_entry.focus_set()); self.bind("<Alt-Left>",lambda e:self.back()); self.bind("<Alt-Right>",lambda e:self.forward())
+        self.style.configure("TButton",padding=(10,7),font=("Segoe UI",10))
+        self.style.configure("Treeview",rowheight=28,font=("Segoe UI",10),fieldbackground="white",background="white")
+        self.style.map("Treeview",background=[("selected","#dbeafe")],foreground=[("selected","#0f172a")])
+        self.build(); self.populate(); self.show_home(); self.protocol("WM_DELETE_WINDOW",self.close)
+
     def load(self):
         try:return json.loads(state_path().read_text(encoding="utf-8"))
         except:return {}
     def save(self):
-        d={"theme":self.theme,"font_size":self.fs,"bookmarks":sorted(self.bookmarks),"read_lessons":sorted(self.read),"last_lesson":self.current}
-        try:state_path().write_text(json.dumps(d,ensure_ascii=False,indent=2),encoding="utf-8")
+        try: state_path().write_text(json.dumps({"bookmarks":sorted(self.bookmarks),"read_lessons":sorted(self.read),"last_lesson":self.current,"font_size":self.fs},ensure_ascii=False,indent=2),encoding="utf-8")
         except:pass
+
     def build(self):
-        self.top=tk.Frame(self,height=60); self.top.pack(fill="x"); self.top.pack_propagate(False)
-        self.brand=tk.Label(self.top,text="TƯ DUY ĐÚNG",font=("Segoe UI",16,"bold")); self.brand.pack(side="left",padx=(18,8)); self.ver=tk.Label(self.top,text=f"BOOK APP • V{VERSION}",font=("Segoe UI",9,"bold")); self.ver.pack(side="left")
-        for txt,cmd,w in [("⌂ Trang chủ",self.show_home,None),("◐",self.toggle_theme,4),("A+",lambda:self.font(1),4),("A−",lambda:self.font(-1),4),("→",self.forward,4),("←",self.back,4)]: ttk.Button(self.top,text=txt,command=cmd,width=w).pack(side="right",padx=3,pady=13)
-        self.body=tk.Frame(self); self.body.pack(fill="both",expand=True); self.side=tk.Frame(self.body,width=330); self.side.pack(side="left",fill="y"); self.side.pack_propagate(False); self.main=tk.Frame(self.body); self.main.pack(side="left",fill="both",expand=True)
-        self.cover=tk.Canvas(self.side,width=294,height=112,highlightthickness=0); self.cover.pack(padx=18,pady=(18,12))
-        s=tk.Frame(self.side); s.pack(fill="x",padx=18,pady=(0,10)); self.search_entry=ttk.Entry(s,textvariable=self.q); self.search_entry.pack(side="left",fill="x",expand=True); self.search_entry.bind("<Return>",lambda e:self.search()); ttk.Button(s,text="Tìm",width=6,command=self.search).pack(side="left",padx=(6,0))
-        n=tk.Frame(self.side); n.pack(fill="x",padx=18,pady=(0,10)); ttk.Button(n,text="Mục lục",command=self.show_all).pack(side="left",fill="x",expand=True); ttk.Button(n,text="★ Đã lưu",command=self.show_bookmarks).pack(side="left",fill="x",expand=True,padx=(6,0))
-        self.progtext=tk.Label(self.side,anchor="w",font=("Segoe UI",9,"bold")); self.progtext.pack(fill="x",padx=18); self.prog=ttk.Progressbar(self.side,maximum=100); self.prog.pack(fill="x",padx=18,pady=(5,12))
-        tw=tk.Frame(self.side); tw.pack(fill="both",expand=True,padx=(12,8),pady=(0,12)); self.tree=ttk.Treeview(tw,show="tree",selectmode="browse"); sc=ttk.Scrollbar(tw,orient="vertical",command=self.tree.yview); self.tree.configure(yscrollcommand=sc.set); self.tree.pack(side="left",fill="both",expand=True); sc.pack(side="right",fill="y"); self.tree.bind("<<TreeviewSelect>>",self.pick)
-        self.home=tk.Frame(self.main); self.reader=tk.Frame(self.main); self.build_home(); self.build_reader()
-    def build_home(self):
-        h=tk.Frame(self.home); h.pack(fill="x",padx=34,pady=(28,12)); self.kicker=tk.Label(h,text="SÁCH TƯƠNG TÁC VỀ TƯ DUY & QUẢN LÝ",font=("Segoe UI",10,"bold"),anchor="w"); self.kicker.pack(fill="x"); self.htitle=tk.Label(h,text="Tư duy đúng. Phương pháp đúng.\nQuản lý đúng.",font=("Segoe UI",28,"bold"),justify="left",anchor="w"); self.htitle.pack(fill="x",pady=(7,7)); self.hdesc=tk.Label(h,text="Đọc ngắn • Hiểu nhanh • Áp dụng ngay vào công việc",font=("Segoe UI",12),anchor="w"); self.hdesc.pack(fill="x")
-        a=tk.Frame(h); a.pack(fill="x",pady=(16,0)); ttk.Button(a,text="▶ Tiếp tục đọc",command=self.continue_reading).pack(side="left"); ttk.Button(a,text="Mở mục lục",command=self.show_all).pack(side="left",padx=8)
-        self.cards_canvas=tk.Canvas(self.home,highlightthickness=0); sb=ttk.Scrollbar(self.home,orient="vertical",command=self.cards_canvas.yview); self.cards=tk.Frame(self.cards_canvas); self.cards.bind("<Configure>",lambda e:self.cards_canvas.configure(scrollregion=self.cards_canvas.bbox("all"))); self.cards_canvas.create_window((0,0),window=self.cards,anchor="nw",tags="cards"); self.cards_canvas.configure(yscrollcommand=sb.set); self.cards_canvas.bind("<Configure>",lambda e:self.cards_canvas.itemconfigure("cards",width=e.width)); self.cards_canvas.pack(side="left",fill="both",expand=True,padx=(26,0),pady=(0,20)); sb.pack(side="right",fill="y",pady=(0,20),padx=(0,18)); self.render_cards()
-    def render_cards(self):
-        for w in self.cards.winfo_children():w.destroy()
+        top=tk.Frame(self,bg="white",height=72); top.pack(fill="x"); top.pack_propagate(False)
+        tk.Label(top,text="TƯ DUY ĐÚNG",bg="white",fg="#274472",font=("Segoe UI",21,"bold")).pack(side="left",padx=(22,10))
+        tk.Label(top,text=f"BOOK APP • V{VERSION}",bg="white",fg="#7a8aa0",font=("Segoe UI",10,"bold")).pack(side="left")
+        ctr=tk.Frame(top,bg="white"); ctr.pack(side="right",padx=18)
+        for text,cmd,w in [("A−",lambda:self.font(-1),4),("A+",lambda:self.font(1),4),("←",self.back,4),("→",self.forward,4),("⌂ Trang chủ",self.show_home,None)]:
+            ttk.Button(ctr,text=text,command=cmd,width=w).pack(side="left",padx=3,pady=18)
+
+        body=tk.Frame(self,bg=self.bg); body.pack(fill="both",expand=True)
+        self.side=tk.Frame(body,bg="white",width=345); self.side.pack(side="left",fill="y",padx=(12,8),pady=12); self.side.pack_propagate(False)
+        self.main=tk.Frame(body,bg=self.bg); self.main.pack(side="left",fill="both",expand=True,padx=(0,12),pady=12)
+        self.build_sidebar()
+        self.home=Scroll(self.main,self.bg); self.reader=Scroll(self.main,self.bg)
+        self.render_home()
+
+    def build_sidebar(self):
+        b=tk.Canvas(self.side,height=128,bg="white",highlightthickness=0); b.pack(fill="x",padx=16,pady=(16,12))
+        b.create_rectangle(0,0,310,128,fill="#8eb1df",outline=""); b.create_rectangle(0,90,310,128,fill="#e6a8a8",outline="")
+        b.create_text(16,18,anchor="nw",text="TƯ DUY",fill="#fff59d",font=("Segoe UI",16,"bold"))
+        b.create_text(16,47,anchor="nw",text="PHƯƠNG PHÁP QUẢN LÝ",fill="white",font=("Segoe UI",17,"bold"))
+        b.create_text(16,80,anchor="nw",text="ĐÚNG",fill="white",font=("Segoe UI",24,"bold"))
+        b.create_text(293,112,anchor="e",text=f"V{VERSION}",fill="white",font=("Segoe UI",9,"bold"))
+        sr=tk.Frame(self.side,bg="white"); sr.pack(fill="x",padx=16,pady=(0,10))
+        ent=ttk.Entry(sr,textvariable=self.q); ent.pack(side="left",fill="x",expand=True); ent.bind("<Return>",lambda e:self.search())
+        ttk.Button(sr,text="Tìm",width=7,command=self.search).pack(side="left",padx=(6,0))
+        br=tk.Frame(self.side,bg="white"); br.pack(fill="x",padx=16,pady=(0,10))
+        ttk.Button(br,text="Mục lục",command=lambda:self.populate()).pack(side="left",fill="x",expand=True)
+        ttk.Button(br,text="★ Đã lưu",command=self.show_bookmarks).pack(side="left",fill="x",expand=True,padx=(6,0))
+        tk.Label(self.side,textvariable=self.progress_var,bg="white",fg="#64748b",font=("Segoe UI",10,"bold")).pack(anchor="w",padx=16)
+        self.prog=ttk.Progressbar(self.side,maximum=100); self.prog.pack(fill="x",padx=16,pady=(6,12))
+        tw=tk.Frame(self.side,bg="white"); tw.pack(fill="both",expand=True,padx=(12,8),pady=(0,12))
+        self.tree=ttk.Treeview(tw,show="tree",selectmode="browse"); sb=ttk.Scrollbar(tw,orient="vertical",command=self.tree.yview)
+        self.tree.configure(yscrollcommand=sb.set); self.tree.pack(side="left",fill="both",expand=True); sb.pack(side="right",fill="y")
+        self.tree.bind("<<TreeviewSelect>>",self.pick)
+
+    def render_home(self):
+        for w in self.home.inner.winfo_children():w.destroy()
+        hero=tk.Frame(self.home.inner,bg="white",bd=1,relief="solid",highlightbackground=self.line); hero.pack(fill="x",pady=(0,16))
+        inn=tk.Frame(hero,bg="white"); inn.pack(fill="x",padx=28,pady=28)
+        tk.Label(inn,text="SÁCH TƯƠNG TÁC VỀ TƯ DUY & QUẢN LÝ",bg="white",fg="#7a8aa0",font=("Segoe UI",11,"bold")).pack(anchor="w")
+        tk.Label(inn,text="Đọc sâu hơn. Dễ nhớ hơn.\nÁp dụng ngay vào công việc.",bg="white",fg=self.text,font=("Segoe UI",28,"bold"),justify="left").pack(anchor="w",pady=(10,8))
+        tk.Label(inn,text="V1.4: 40 bài học có sơ đồ màu + lý do quan trọng + sai lầm thường gặp + bài tập áp dụng + câu hỏi phản tư.",bg="white",fg=self.muted,font=("Segoe UI",12),wraplength=900,justify="left").pack(anchor="w")
+        rr=tk.Frame(inn,bg="white"); rr.pack(anchor="w",pady=(18,0))
+        ttk.Button(rr,text="▶ Tiếp tục đọc",command=self.continue_reading).pack(side="left")
+        ttk.Button(rr,text="★ Bài đã lưu",command=self.show_bookmarks).pack(side="left",padx=8)
+        grid=tk.Frame(self.home.inner,bg=self.bg); grid.pack(fill="both",expand=True)
         for i,c in enumerate(CHAPTERS):
-            card=tk.Frame(self.cards); card.pack(fill="x",padx=8,pady=6); tk.Label(card,text=f"{i+1:02}",font=("Segoe UI",16,"bold"),width=4).pack(side="left",padx=(10,8),pady=14); t=tk.Frame(card); t.pack(side="left",fill="both",expand=True,pady=10); tk.Label(t,text=c["title"],font=("Segoe UI",12,"bold"),anchor="w").pack(fill="x"); tk.Label(t,text=c["subtitle"],font=("Segoe UI",9),anchor="w").pack(fill="x",pady=(3,0)); cnt=len(c["lessons"]); ttk.Button(card,text=f"Mở {cnt} bài" if cnt else "Đang biên soạn",state="normal" if cnt else "disabled",command=lambda x=i:self.open_chapter(x)).pack(side="right",padx=14,pady=18)
-    def build_reader(self):
-        h=tk.Frame(self.reader); h.pack(fill="x",padx=34,pady=(26,8)); self.lid=tk.Label(h,font=("Segoe UI",10,"bold"),anchor="w"); self.lid.pack(fill="x"); self.ltitle=tk.Label(h,font=("Segoe UI",25,"bold"),anchor="w",justify="left"); self.ltitle.pack(fill="x",pady=(4,6)); self.lsum=tk.Label(h,font=("Segoe UI",11),anchor="w",justify="left",wraplength=780); self.lsum.pack(fill="x")
-        tools=tk.Frame(self.reader); tools.pack(fill="x",padx=34,pady=(2,8)); ttk.Button(tools,textvariable=self.bm,command=self.toggle_bookmark).pack(side="left"); ttk.Button(tools,text="✓ Đã đọc",command=self.mark_read).pack(side="left",padx=6); self.rstatus=tk.Label(tools,textvariable=self.status,font=("Segoe UI",9,"bold")); self.rstatus.pack(side="right")
-        tw=tk.Frame(self.reader); tw.pack(fill="both",expand=True,padx=34,pady=(0,10)); self.text=tk.Text(tw,wrap="word",relief="flat",bd=0,padx=24,pady=20,cursor="arrow"); sc=ttk.Scrollbar(tw,orient="vertical",command=self.text.yview); self.text.configure(yscrollcommand=sc.set); self.text.pack(side="left",fill="both",expand=True); sc.pack(side="right",fill="y"); self.text.configure(state="disabled")
-        f=tk.Frame(self.reader,height=52); f.pack(fill="x",padx=34,pady=(0,16)); f.pack_propagate(False); ttk.Button(f,text="← Bài trước",command=self.prev).pack(side="left",pady=9); self.finfo=tk.Label(f,font=("Segoe UI",9)); self.finfo.pack(pady=15); ttk.Button(f,text="Bài sau →",command=self.next).pack(side="right",pady=9)
-    def apply_theme(self):
-        c={"bg":"#101827","side":"#121d2f","panel":"#18253a","card":"#1d2b42","text":"#f4f7fb","muted":"#9fb0c6","accent":"#78a9ff","navy":"#19345d","red":"#9f2f39"} if self.theme=="dark" else {"bg":"#eef3f9","side":"#ffffff","panel":"#ffffff","card":"#f8fafc","text":"#172033","muted":"#667085","accent":"#215ea7","navy":"#173d73","red":"#c73743"}; self.c=c
-        self.configure(bg=c["bg"]); self.top.configure(bg=c["panel"]); self.body.configure(bg=c["bg"]); self.side.configure(bg=c["side"]); self.main.configure(bg=c["bg"]); self.home.configure(bg=c["bg"]); self.reader.configure(bg=c["bg"]); self.walk(self); self.style.configure("Treeview",background=c["side"],fieldbackground=c["side"],foreground=c["text"],rowheight=28,borderwidth=0); self.style.map("Treeview",background=[("selected",c["accent"])],foreground=[("selected","white")]); self.style.configure("TButton",padding=(9,6)); self.style.configure("TEntry",padding=5); self.text.configure(bg=c["panel"],fg=c["text"],selectbackground=c["accent"],font=("Segoe UI",self.fs),spacing3=7); self.tags(); self.draw_cover()
-        for card in self.cards.winfo_children():
-            card.configure(bg=c["card"])
-            for w in card.winfo_children():
-                if isinstance(w,tk.Frame):w.configure(bg=c["card"])
-    def walk(self,w):
-        for x in w.winfo_children():
-            try:
-                if isinstance(x,tk.Frame): x.configure(bg=x.master.cget("bg"))
-                elif isinstance(x,tk.Label): x.configure(bg=x.master.cget("bg"),fg=self.c["text"])
-                elif isinstance(x,tk.Canvas) and x is not self.cover: x.configure(bg=x.master.cget("bg"))
-            except:pass
-            self.walk(x)
-    def tags(self):
-        self.text.tag_configure("body",font=("Segoe UI",self.fs),foreground=self.c["text"],spacing3=7); self.text.tag_configure("head",font=("Segoe UI",self.fs+2,"bold"),foreground=self.c["accent"],spacing1=12,spacing3=6); self.text.tag_configure("lead",font=("Segoe UI",self.fs+1,"bold"),foreground=self.c["text"],spacing3=6)
-    def draw_cover(self):
-        c=self.c; self.cover.delete("all"); self.cover.configure(bg=c["side"]); self.cover.create_rectangle(0,0,294,112,fill=c["navy"],outline=""); self.cover.create_rectangle(0,87,294,112,fill=c["red"],outline=""); self.cover.create_text(18,22,text="TƯ DUY",anchor="w",fill="#f7d928",font=("Segoe UI",13,"bold")); self.cover.create_text(18,49,text="PHƯƠNG PHÁP QUẢN LÝ",anchor="w",fill="white",font=("Segoe UI",15,"bold")); self.cover.create_text(18,76,text="ĐÚNG",anchor="w",fill="white",font=("Segoe UI",22,"bold")); self.cover.create_text(280,100,text=f"V{VERSION}",anchor="e",fill="white",font=("Segoe UI",8,"bold"))
-    def populate(self,items=None):
-        self.tree.delete(*self.tree.get_children())
-        if items is not None:
-            for l in items:self.tree.insert("","end",iid="l"+l["id"],text=f'{l["id"]}  {l["title"]}')
-        else:
-            for i,c in enumerate(CHAPTERS):
-                p=self.tree.insert("","end",iid=f"c{i}",text=c["title"],open=i<3)
-                for l in c["lessons"]:self.tree.insert(p,"end",iid="l"+l["id"],text=("✓ " if l["id"] in self.read else "")+f'{l["id"]}  {l["title"]}'+(" ★" if l["id"] in self.bookmarks else ""))
-                if not c["lessons"]:self.tree.insert(p,"end",iid=f"e{i}",text="   Đang biên soạn")
-        self.progress()
-    def progress(self):
-        total=len(self.lessons); done=len(self.read & set(self.byid)); pct=round(done*100/total) if total else 0; self.prog["value"]=pct; self.progtext.configure(text=f"TIẾN ĐỘ ĐỌC  {done}/{total} bài • {pct}%")
-    def show_home(self):self.mode="home"; self.reader.pack_forget(); self.home.pack(fill="both",expand=True); self.progress()
-    def show_reader(self):self.mode="reader"; self.home.pack_forget(); self.reader.pack(fill="both",expand=True)
-    def continue_reading(self):self.show_lesson(self.current if self.current in self.byid else "1.1")
-    def show_all(self):self.populate(); self.show_home()
-    def show_bookmarks(self):
-        x=[l for l in self.lessons if l["id"] in self.bookmarks]; self.populate(x)
-        if not x:messagebox.showinfo("Đã lưu","Chưa có bài nào được đánh dấu.")
-    def search(self):
-        q=self.q.get().strip().lower()
-        if not q:self.show_all();return
-        x=[l for l in self.lessons if q in (l["id"]+l["title"]+l["summary"]+l["content"]).lower()]; self.populate(x)
-        if not x:messagebox.showinfo("Tìm kiếm","Không tìm thấy nội dung phù hợp.")
-    def open_chapter(self,i):
-        if CHAPTERS[i]["lessons"]:self.show_lesson(CHAPTERS[i]["lessons"][0]["id"])
-    def pick(self,_=None):
-        s=self.tree.selection()
-        if not s or not s[0].startswith("l"): return
-        lid=s[0][1:]
-        if lid not in self.byid: return
-        # Prevent recursive TreeviewSelect events when the program itself
-        # refreshes/selects the current lesson.
-        if self.mode=="reader" and lid==self.current: return
-        self.show_lesson(lid)
+            p=list(PALETTES.values())[i%len(PALETTES)]
+            card=tk.Frame(grid,bg="white",bd=1,relief="solid",highlightbackground=self.line); card.grid(row=i//2,column=i%2,sticky="nsew",padx=8,pady=8)
+            grid.grid_columnconfigure(i%2,weight=1)
+            h=tk.Frame(card,bg=p["soft"]); h.pack(fill="x")
+            tk.Label(h,text=f"{i+1:02}",bg=p["soft"],fg=p["primary"],font=("Segoe UI",20,"bold")).pack(side="left",padx=14,pady=12)
+            tb=tk.Frame(h,bg=p["soft"]); tb.pack(side="left",fill="both",expand=True,pady=12)
+            tk.Label(tb,text=c["title"],bg=p["soft"],fg=self.text,font=("Segoe UI",13,"bold"),anchor="w").pack(fill="x")
+            tk.Label(tb,text=c["subtitle"],bg=p["soft"],fg=self.muted,font=("Segoe UI",10),anchor="w",wraplength=430,justify="left").pack(fill="x")
+            ft=tk.Frame(card,bg="white"); ft.pack(fill="x",padx=14,pady=12)
+            tk.Label(ft,text=f'{len(c["lessons"])} bài',bg="white",fg=self.muted,font=("Segoe UI",10,"bold")).pack(side="left")
+            ttk.Button(ft,text="Mở chương",command=lambda x=i:self.open_chapter(x)).pack(side="right")
+
+    def show_home(self):
+        self.reader.pack_forget(); self.home.pack(fill="both",expand=True); self.render_home(); self.update_progress()
+
     def show_lesson(self,lid,add=True):
         if lid not in self.byid:return
-        self.show_reader(); self.current=lid; l=self.byid[lid]; self.lid.configure(text=f"BÀI {lid}"); self.ltitle.configure(text=l["title"]); self.lsum.configure(text=l["summary"]); self.bm.set("★ Đã lưu" if lid in self.bookmarks else "☆ Lưu bài"); self.status.set("Đã đọc" if lid in self.read else "Chưa đánh dấu đã đọc")
-        self.text.configure(state="normal"); self.text.delete("1.0","end")
-        for i,line in enumerate(l["content"].splitlines()):
-            z=line.strip(); tag="lead" if i==0 and z else ("head" if z and z.isupper() else "body"); self.text.insert("end",line+"\n",tag)
-        self.text.configure(state="disabled"); self.text.yview_moveto(0); self.finfo.configure(text=f"Bài {self.lessons.index(l)+1}/{len(self.lessons)}")
+        self.current=lid; l=self.byid[lid]
+        self.home.pack_forget(); self.reader.pack(fill="both",expand=True)
+        self.render_lesson(l); self.reader.top()
         if add:
             if self.hpos<len(self.hist)-1:self.hist=self.hist[:self.hpos+1]
             if not self.hist or self.hist[-1]!=lid:self.hist.append(lid); self.hpos=len(self.hist)-1
-        self.save(); self.select(lid)
+        self.select(lid); self.save()
+
+    def render_lesson(self,l):
+        for w in self.reader.inner.winfo_children():w.destroy()
+        p=PALETTES.get(l["style"],PALETTES["flow"])
+        head=tk.Frame(self.reader.inner,bg="white",bd=1,relief="solid",highlightbackground=self.line); head.pack(fill="x",pady=(0,14))
+        hi=tk.Frame(head,bg="white"); hi.pack(fill="x",padx=22,pady=18)
+        left=tk.Frame(hi,bg="white"); left.pack(side="left",fill="both",expand=True)
+        tk.Label(left,text=f'BÀI {l["id"]}',bg="white",fg=p["primary"],font=("Segoe UI",11,"bold")).pack(anchor="w")
+        row=tk.Frame(left,bg="white"); row.pack(fill="x",pady=(8,0))
+        tk.Frame(row,bg=p["primary"],width=9,height=54).pack(side="left",padx=(0,14))
+        tk.Label(row,text=l["title"],bg="white",fg=self.text,font=("Segoe UI",31,"bold"),anchor="w",justify="left").pack(side="left",fill="x",expand=True)
+        tk.Label(left,text=l["summary"],bg="white",fg=self.muted,font=("Segoe UI",14),anchor="w",justify="left",wraplength=850).pack(anchor="w",pady=(8,0))
+        right=tk.Frame(hi,bg="white"); right.pack(side="right",padx=(16,0))
+        self.bookmark_var.set("★ Đã lưu" if l["id"] in self.bookmarks else "☆ Lưu bài")
+        ttk.Button(right,textvariable=self.bookmark_var,command=self.toggle_bookmark).pack(side="left",padx=4)
+        ttk.Button(right,text="✓ Đã đọc",command=self.mark_read).pack(side="left",padx=4)
+
+        self.diagram(l,p)
+
+        r1=tk.Frame(self.reader.inner,bg=self.bg); r1.pack(fill="x",pady=(0,12))
+        self.card(r1,"KHÁI NIỆM",l["concept"],p["soft"],p["primary"]).pack(side="left",fill="both",expand=True,padx=(0,7))
+        self.card(r1,"CÁCH ÁP DỤNG",l["method"],p["accent2"],p["accent"]).pack(side="left",fill="both",expand=True,padx=(7,0))
+
+        r2=tk.Frame(self.reader.inner,bg=self.bg); r2.pack(fill="x",pady=(0,12))
+        self.card(r2,"TẠI SAO QUAN TRỌNG?",l["why"],"#fff7ed","#c2410c").pack(side="left",fill="both",expand=True,padx=(0,7))
+        self.mistake_card(r2,l["mistakes"]).pack(side="left",fill="both",expand=True,padx=(7,0))
+
+        r3=tk.Frame(self.reader.inner,bg=self.bg); r3.pack(fill="x",pady=(0,12))
+        self.card(r3,"VÍ DỤ THỰC TẾ",l["example"],p["alt2"],p["alt"]).pack(side="left",fill="both",expand=True,padx=(0,7))
+        self.check_card(r3,l["checklist"],p).pack(side="left",fill="both",expand=True,padx=(7,0))
+
+        r4=tk.Frame(self.reader.inner,bg=self.bg); r4.pack(fill="x",pady=(0,12))
+        self.card(r4,"BÀI TẬP ÁP DỤNG NGAY",l["practice"],"#f3e8ff","#7e22ce").pack(side="left",fill="both",expand=True,padx=(0,7))
+        self.reflect_card(r4,l["reflect"]).pack(side="left",fill="both",expand=True,padx=(7,0))
+
+        take=tk.Frame(self.reader.inner,bg="white",bd=1,relief="solid",highlightbackground=self.line); take.pack(fill="x")
+        ti=tk.Frame(take,bg="white"); ti.pack(fill="x",padx=18,pady=16)
+        tk.Label(ti,text="BÀI HỌC CHÍNH",bg="white",fg=p["primary"],font=("Segoe UI",16,"bold")).pack(anchor="w")
+        names=" → ".join([x[0] for x in l["blocks"]])
+        tk.Label(ti,text=f"Hãy nhớ chuỗi: {names}. Đừng chỉ đọc; hãy thử áp dụng bài tập của bài này vào một tình huống thật trong công việc.",bg="white",fg=self.text,font=("Segoe UI",self.fs+1),wraplength=930,justify="left").pack(anchor="w",pady=(8,0))
+        ft=tk.Frame(self.reader.inner,bg=self.bg); ft.pack(fill="x",pady=(14,2))
+        ttk.Button(ft,text="← Bài trước",command=self.prev).pack(side="left")
+        tk.Label(ft,text=self.position(),bg=self.bg,fg=self.muted,font=("Segoe UI",10,"bold")).pack(side="left",padx=12)
+        ttk.Button(ft,text="Bài sau →",command=self.next).pack(side="right")
+
+    def diagram(self,l,p):
+        out=tk.Frame(self.reader.inner,bg="white",bd=1,relief="solid",highlightbackground=self.line); out.pack(fill="x",pady=(0,14))
+        f=tk.Frame(out,bg="white"); f.pack(fill="x",padx=14,pady=14)
+        tk.Label(f,text="SƠ ĐỒ GHI NHỚ",bg="white",fg=p["primary"],font=("Segoe UI",17,"bold")).pack(anchor="w",pady=(0,10))
+        style=l["style"]; blocks=l["blocks"]
+        if style=="matrix":
+            g=tk.Frame(f,bg="white"); g.pack(fill="x")
+            for c in range(2):g.grid_columnconfigure(c,weight=1)
+            for i,b in enumerate(blocks):
+                self.block(g,b,p,i).grid(row=i//2,column=i%2,sticky="nsew",padx=6,pady=6)
+        elif style=="ladder":
+            for i,b in enumerate(blocks):
+                rr=tk.Frame(f,bg="white"); rr.pack(fill="x",pady=4)
+                tk.Label(rr,text=str(i+1).zfill(2),bg=p["primary"],fg="white",font=("Segoe UI",12,"bold"),width=4).pack(side="left",ipady=7,padx=(0,8))
+                self.block(rr,b,p,i).pack(side="left",fill="x",expand=True)
+        elif style=="cycle" and len(blocks)>=4:
+            g=tk.Frame(f,bg="white"); g.pack(fill="x")
+            for c in range(2):g.grid_columnconfigure(c,weight=1)
+            order=[0,1,3,2]
+            for k,i in enumerate(order):
+                self.block(g,blocks[i],p,i).grid(row=k//2,column=k%2,sticky="nsew",padx=6,pady=6)
+        else:
+            rr=tk.Frame(f,bg="white"); rr.pack(fill="x")
+            for i,b in enumerate(blocks):
+                self.block(rr,b,p,i).pack(side="left",fill="both",expand=True,padx=5)
+                if i<len(blocks)-1:tk.Label(rr,text="➜",bg="white",fg=p["primary"],font=("Segoe UI",26,"bold")).pack(side="left")
+
+    def block(self,parent,b,p,i):
+        schemes=[(p["soft"],p["primary"]),(p["alt2"],p["alt"]),(p["accent2"],p["accent"]),("#f1f5f9","#334155")]
+        bg,fg=schemes[i%len(schemes)]
+        z=tk.Frame(parent,bg=bg,bd=1,relief="solid",highlightbackground=self.line)
+        tk.Label(z,text=b[0],bg=bg,fg=fg,font=("Segoe UI",15,"bold")).pack(anchor="w",padx=14,pady=(12,5))
+        tk.Label(z,text=b[1],bg=bg,fg=self.text,font=("Segoe UI",self.fs+1),wraplength=260,justify="left").pack(anchor="w",padx=14,pady=(0,12))
+        return z
+
+    def card(self,parent,title,body,bg,fg):
+        c=tk.Frame(parent,bg="white",bd=1,relief="solid",highlightbackground=self.line)
+        h=tk.Frame(c,bg=bg); h.pack(fill="x")
+        tk.Label(h,text=title,bg=bg,fg=fg,font=("Segoe UI",16,"bold")).pack(anchor="w",padx=14,pady=10)
+        tk.Label(c,text=body,bg="white",fg=self.text,font=("Segoe UI",self.fs+1),wraplength=505,justify="left").pack(anchor="w",padx=16,pady=16)
+        return c
+
+    def mistake_card(self,parent,items):
+        c=tk.Frame(parent,bg="white",bd=1,relief="solid",highlightbackground=self.line)
+        h=tk.Frame(c,bg="#fee2e2"); h.pack(fill="x")
+        tk.Label(h,text="SAI LẦM THƯỜNG GẶP",bg="#fee2e2",fg="#b91c1c",font=("Segoe UI",16,"bold")).pack(anchor="w",padx=14,pady=10)
+        for x in items: tk.Label(c,text="✕  "+x,bg="white",fg=self.text,font=("Segoe UI",self.fs+1),wraplength=490,justify="left").pack(anchor="w",padx=16,pady=5)
+        tk.Frame(c,bg="white",height=8).pack()
+        return c
+
+    def check_card(self,parent,items,p):
+        c=tk.Frame(parent,bg="white",bd=1,relief="solid",highlightbackground=self.line)
+        h=tk.Frame(c,bg=p["accent2"]); h.pack(fill="x")
+        tk.Label(h,text="CHECKLIST",bg=p["accent2"],fg=p["accent"],font=("Segoe UI",16,"bold")).pack(anchor="w",padx=14,pady=10)
+        for x in items: tk.Label(c,text="☐  "+x,bg="white",fg=self.text,font=("Segoe UI",self.fs+1),wraplength=490,justify="left").pack(anchor="w",padx=16,pady=5)
+        tk.Frame(c,bg="white",height=8).pack()
+        return c
+
+    def reflect_card(self,parent,items):
+        c=tk.Frame(parent,bg="white",bd=1,relief="solid",highlightbackground=self.line)
+        h=tk.Frame(c,bg="#e0f2fe"); h.pack(fill="x")
+        tk.Label(h,text="CÂU HỎI TỰ PHẢN TƯ",bg="#e0f2fe",fg="#0369a1",font=("Segoe UI",16,"bold")).pack(anchor="w",padx=14,pady=10)
+        for i,x in enumerate(items,1): tk.Label(c,text=f"{i}.  {x}",bg="white",fg=self.text,font=("Segoe UI",self.fs+1),wraplength=490,justify="left").pack(anchor="w",padx=16,pady=7)
+        tk.Frame(c,bg="white",height=8).pack()
+        return c
+
+    def populate(self,items=None):
+        self.block_tree=True; self.tree.delete(*self.tree.get_children())
+        if items is None:
+            for i,c in enumerate(CHAPTERS):
+                p=self.tree.insert("","end",iid=f"c{i}",text=c["title"],open=i<3)
+                for l in c["lessons"]:
+                    tx=("✓ " if l["id"] in self.read else "")+l["id"]+"  "+l["title"]+("  ★" if l["id"] in self.bookmarks else "")
+                    self.tree.insert(p,"end",iid="l"+l["id"],text=tx)
+        else:
+            for l in items:self.tree.insert("","end",iid="l"+l["id"],text=l["id"]+"  "+l["title"])
+        self.block_tree=False; self.update_progress()
+
+    def update_progress(self):
+        done=len([x for x in self.read if x in self.byid]); total=len(self.lessons); pct=round(done*100/total) if total else 0
+        self.prog["value"]=pct; self.progress_var.set(f"TIẾN ĐỘ ĐỌC  {done}/{total} bài • {pct}%")
+
+    def pick(self,e=None):
+        if self.block_tree:return
+        s=self.tree.selection()
+        if s and s[0].startswith("l"):
+            lid=s[0][1:]
+            if lid in self.byid and lid!=self.current:self.show_lesson(lid)
+
     def select(self,lid):
-        i="l"+lid
-        if self.tree.exists(i):self.tree.selection_set(i); self.tree.see(i)
-    def back(self):
-        if self.mode=="home":self.exit_confirm();return
-        if self.hpos>0:self.hpos-=1; self.show_lesson(self.hist[self.hpos],False)
-        else:self.show_home()
-    def forward(self):
-        if self.hpos<len(self.hist)-1:self.hpos+=1; self.show_lesson(self.hist[self.hpos],False)
+        iid="l"+lid
+        if self.tree.exists(iid):
+            self.block_tree=True; self.tree.selection_set(iid); self.tree.see(iid); self.block_tree=False
+
+    def search(self):
+        q=self.q.get().strip().lower()
+        if not q:self.populate();return
+        out=[]
+        for l in self.lessons:
+            blob=" ".join([l["id"],l["title"],l["summary"],l["concept"],l["method"],l["example"],l["why"],l["practice"]," ".join(l["mistakes"])," ".join(l["reflect"])]).lower()
+            if q in blob:out.append(l)
+        self.populate(out)
+        if not out:messagebox.showinfo("Tìm kiếm","Không tìm thấy nội dung phù hợp.")
+
+    def show_bookmarks(self):
+        x=[l for l in self.lessons if l["id"] in self.bookmarks]; self.populate(x)
+        if not x:messagebox.showinfo("Đã lưu","Chưa có bài nào được đánh dấu.")
+
+    def open_chapter(self,i):
+        if CHAPTERS[i]["lessons"]:self.show_lesson(CHAPTERS[i]["lessons"][0]["id"])
+    def continue_reading(self):self.show_lesson(self.current if self.current in self.byid else "1.1")
+    def toggle_bookmark(self):
+        if self.current in self.bookmarks:self.bookmarks.remove(self.current)
+        else:self.bookmarks.add(self.current)
+        self.populate(); self.select(self.current); self.show_lesson(self.current,False)
+    def mark_read(self):
+        self.read.add(self.current); self.populate(); self.select(self.current); self.show_lesson(self.current,False)
+    def font(self,d):
+        self.fs=max(11,min(17,self.fs+d)); self.show_lesson(self.current,False); self.save()
+    def position(self):
+        i=next((n for n,l in enumerate(self.lessons) if l["id"]==self.current),0); return f"Bài {i+1}/{len(self.lessons)}"
     def prev(self):
         i=next((n for n,l in enumerate(self.lessons) if l["id"]==self.current),0)
         if i>0:self.show_lesson(self.lessons[i-1]["id"])
     def next(self):
         i=next((n for n,l in enumerate(self.lessons) if l["id"]==self.current),0)
         if i<len(self.lessons)-1:self.show_lesson(self.lessons[i+1]["id"])
-    def toggle_bookmark(self):
-        if self.current in self.bookmarks:self.bookmarks.remove(self.current)
-        else:self.bookmarks.add(self.current)
-        self.bm.set("★ Đã lưu" if self.current in self.bookmarks else "☆ Lưu bài"); self.save(); self.populate(); self.select(self.current)
-    def mark_read(self):self.read.add(self.current); self.status.set("Đã đọc"); self.save(); self.populate(); self.select(self.current)
-    def font(self,d):self.fs=max(10,min(20,self.fs+d)); self.tags(); self.save()
-    def toggle_theme(self):self.theme="dark" if self.theme=="light" else "light"; self.apply_theme(); self.save()
-    def exit_confirm(self):
+    def back(self):
+        if self.hpos>0:self.hpos-=1; self.show_lesson(self.hist[self.hpos],False)
+        else:self.show_home()
+    def forward(self):
+        if self.hpos<len(self.hist)-1:self.hpos+=1; self.show_lesson(self.hist[self.hpos],False)
+    def close(self):
         self.save()
         if messagebox.askyesno("Thoát ứng dụng","Bạn muốn thoát Tư Duy Đúng – Book App?"):self.destroy()
 
