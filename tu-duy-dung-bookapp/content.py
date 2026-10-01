@@ -16,8 +16,16 @@ def lesson(i, title, summary, concept, method, example, checklist, blocks, style
         "reflect": reflect or [],
     }
 
-def L(i,t,s,c,m,e,b,st,w="",mis=None,p="",r=None):
-    return lesson(i,t,s,c,m,e,b,st,w,mis,p,r)
+def L(i,t,s,c,m,e,blocks,style,why="",mis=None,p="",r=None):
+    # The lesson calls use: blocks, style, why, mistakes, practice, reflect.
+    # Build a practical checklist automatically so the data schema remains complete.
+    safe_blocks = blocks if isinstance(blocks, list) else []
+    checklist = []
+    for item in safe_blocks[:3]:
+        if isinstance(item, (list, tuple)) and item:
+            checklist.append(f"Đã xác định rõ {str(item[0]).lower()} chưa?")
+    checklist.append("Đã có dữ liệu hoặc ví dụ thực tế để kiểm chứng chưa?")
+    return lesson(i,t,s,c,m,e,checklist,safe_blocks,style,why,mis,p,r)
 
 CHAPTERS=[
 {"title":"1. Tư duy đúng trước khi hành động","subtitle":"Nhìn đúng vấn đề trước khi chọn giải pháp.","lessons":[
