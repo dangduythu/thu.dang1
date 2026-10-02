@@ -5,7 +5,7 @@ from tkinter import ttk, messagebox
 from content import CHAPTERS
 
 APP_NAME="Tư Duy Đúng – Book App"
-VERSION="1.4.2"
+VERSION="1.4.3"
 APP_DIR="TuDuyDungBookApp"
 
 PALETTES={
@@ -33,9 +33,10 @@ class Scroll(tk.Frame):
         self.win=self.canvas.create_window((0,0),window=self.inner,anchor="nw")
         self.inner.bind("<Configure>",lambda e:self.canvas.configure(scrollregion=self.canvas.bbox("all")))
         self.canvas.bind("<Configure>",lambda e:self.canvas.itemconfigure(self.win,width=e.width))
-        self.inner.bind("<Enter>",lambda e:self.canvas.bind_all("<MouseWheel>",self._wheel))
-        self.inner.bind("<Leave>",lambda e:self.canvas.unbind_all("<MouseWheel>"))
-    def _wheel(self,e): self.canvas.yview_scroll(int(-e.delta/120),"units")
+        # Mouse-wheel routing is handled globally by App so scrolling remains
+        # reliable even when the pointer is over nested labels/cards/buttons.
+    def scroll_units(self, units):
+        self.canvas.yview_scroll(units,"units")
     def top(self): self.canvas.yview_moveto(0)
 
 class App(tk.Tk):
@@ -58,6 +59,48 @@ class App(tk.Tk):
         self.style.configure("Treeview",rowheight=28,font=("Segoe UI",10),fieldbackground="white",background="white")
         self.style.map("Treeview",background=[("selected","#dbeafe")],foreground=[("selected","#0f172a")])
         self.build(); self.populate(); self.show_home(); self.protocol("WM_DELETE_WINDOW",self.close)
+        self.bind_all("<MouseWheel>", self.global_mousewheel, add="+")
+        self.bind_all("<Button-4>", self.global_mousewheel_linux, add="+")
+        self.bind_all("<Button-5>", self.global_mousewheel_linux, add="+")
+
+    def _is_descendant(self, widget, ancestor):
+        cur=widget
+        while cur is not None:
+            if cur==ancestor:return True
+            try:cur=cur.master
+            except:return False
+        return False
+
+    def _scroll_target_under_pointer(self, event):
+        try:
+            w=self.winfo_containing(event.x_root,event.y_root)
+        except:
+            w=None
+        if w is None:return None
+        # Sidebar Treeview keeps its own native scrolling behavior.
+        if self._is_descendant(w,self.tree):return None
+        if self.reader.winfo_ismapped() and (self._is_descendant(w,self.reader.canvas) or self._is_descendant(w,self.reader.inner)):
+            return self.reader
+        if self.home.winfo_ismapped() and (self._is_descendant(w,self.home.canvas) or self._is_descendant(w,self.home.inner)):
+            return self.home
+        return None
+
+    def global_mousewheel(self,event):
+        target=self._scroll_target_under_pointer(event)
+        if target is None:return
+        delta=event.delta
+        if delta==0:return "break"
+        # Windows normally sends multiples of 120. Use a minimum of one unit
+        # for high-resolution touchpads that send smaller deltas.
+        steps=max(1,abs(int(delta/120))) if abs(delta)>=120 else 1
+        target.scroll_units(-steps if delta>0 else steps)
+        return "break"
+
+    def global_mousewheel_linux(self,event):
+        target=self._scroll_target_under_pointer(event)
+        if target is None:return
+        target.scroll_units(-1 if event.num==4 else 1)
+        return "break"
 
     def load(self):
         try:return json.loads(state_path().read_text(encoding="utf-8"))
