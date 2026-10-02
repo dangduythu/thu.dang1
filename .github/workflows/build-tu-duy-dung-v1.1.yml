@@ -1,4 +1,4 @@
-name: Build Tu Duy Dung Book App V2.5.1
+name: Build Tu Duy Dung Book App V2.6
 
 on:
   workflow_dispatch:
@@ -32,9 +32,9 @@ jobs:
       - name: Syntax check
         working-directory: tu-duy-dung-bookapp
         run: |
-          python -m py_compile app.py content.py learning_data.py validate.py
+          python -m py_compile app.py content.py learning_data.py stories.py validate.py
 
-      - name: Validate all V2.5.1 learning data
+      - name: Validate all V2.6 learning data
         working-directory: tu-duy-dung-bookapp
         run: |
           python validate.py
@@ -43,24 +43,24 @@ jobs:
         working-directory: tu-duy-dung-bookapp
         shell: powershell
         run: |
-          python -c "import app; a=app.App(); a.update(); a.continue_reading(); [a.update() for _ in range(5)]; assert a.current_view=='lesson'; assert not getattr(a,'_rendering_lesson',False); a.show_lesson('1.2'); [a.update() for _ in range(5)]; assert a.current_lesson=='1.2'; a.show_lesson('6.1'); [a.update() for _ in range(5)]; assert a.current_lesson=='6.1'; a.show_quiz('1.2'); a.update(); a.show_cases(); a.update(); a.show_tools(); a.update(); a.show_glossary(); a.update(); a.show_progress(); a.update(); a.destroy(); print('GUI event-loop regression test OK')"
+          python -c "import app; a=app.App(); a.update(); assert len(app.STORIES)==40; a.continue_reading(); [a.update() for _ in range(5)]; assert a.current_view=='lesson'; assert not getattr(a,'_rendering_lesson',False); a.show_lesson('1.2'); [a.update() for _ in range(5)]; assert a.current_lesson=='1.2'; a.show_lesson('6.1'); [a.update() for _ in range(5)]; assert a.current_lesson=='6.1'; a.show_quiz('1.2'); a.update(); a.show_cases(); a.update(); a.show_tools(); a.update(); a.show_glossary(); a.update(); a.show_progress(); a.update(); a.destroy(); print('V2.6 GUI regression test OK')"
 
       - name: Build portable EXE
         working-directory: tu-duy-dung-bookapp
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.5.1" app.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.6" app.py
 
       - name: Verify EXE exists
         shell: powershell
         run: |
-          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.5.1.exe")) { throw "EXE not found" }
-          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.5.1.exe").Length
+          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.6.exe")) { throw "EXE not found" }
+          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.6.exe").Length
           if ($size -lt 1000000) { throw "EXE size looks invalid: $size" }
           Write-Host "EXE size: $size bytes"
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_BookApp_V2.5.1_Windows
-          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.5.1.exe
+          name: TuDuyDung_BookApp_V2.6_Windows
+          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.6.exe
           if-no-files-found: error
