@@ -1,29 +1,22 @@
-# Tư Duy Đúng / Think Right – Book App V2.7
+# Tư Duy Đúng / Think Right – Book App V2.7.1
 
-V2.7 là bản **song ngữ Việt – Anh toàn bộ chương trình**, phát triển từ V2.6 và giữ nguyên nội dung/tính năng cũ.
+V2.7.1 giữ nguyên toàn bộ nội dung và chức năng song ngữ của V2.7, đồng thời sửa lỗi chữ tiếng Anh bị tràn/cắt ở các card bên phải.
 
-## Điểm mới V2.7
-- Mặc định hiển thị **Song ngữ (BI)**.
-- Có thể chuyển nhanh giữa **BI / VI / EN**.
-- 10 chương và 40 bài học đều có bản tiếng Anh tương ứng.
-- Toàn bộ 40 câu chuyện ghi nhớ được dịch sang tiếng Anh.
-- Sơ đồ ghi nhớ hiển thị song ngữ.
-- Các khối Khái niệm, Cách áp dụng, Tại sao quan trọng, Sai lầm, Ví dụ, Checklist, Bài tập và Reflection đều song ngữ.
-- Quiz song ngữ cho toàn bộ 40 bài.
-- 8 Case Study song ngữ.
-- 15 Thinking & Management Tools song ngữ.
-- Toàn bộ từ điển tích hợp có định nghĩa Việt – Anh.
-- Trang chủ, mục lục, tiến độ, nút điều hướng và thông báo chính được thiết kế lại theo hướng song ngữ.
-- Giữ cơ chế lưu progress/bookmark/quiz/case của các phiên bản trước.
-- Giữ fix cuộn chuột và chống vòng lặp Treeview gây treo.
+## Sửa giao diện V2.7.1
+- Bỏ layout ép VI/EN thành hai cột hẹp bên trong các card nửa màn hình.
+- Ở chế độ BI, mỗi card hiển thị **VI ở trên – EN ở dưới** với đường phân cách rõ ràng.
+- Wrap text được tính theo **bề rộng thực tế của widget**, không còn dùng wraplength cố định.
+- Resize cửa sổ vẫn tự điều chỉnh dòng chữ.
+- Tiêu đề card cũng tự wrap theo độ rộng.
+- Checklist và Common mistakes được render dạng responsive, không bị cắt phần English.
+- Giữ nguyên BI / VI / EN, 40 bài, 40 stories, Quiz, Case Study, Tools, Glossary và Progress.
+- Giữ toàn bộ fix cuộn chuột và chống treo Treeview từ các bản trước.
 
 ## Kiểm thử trước build
-GitHub Actions bắt buộc chạy:
 1. Syntax check toàn bộ module.
-2. Validate đủ 10 chương / 40 bài.
-3. Validate English translation coverage 1:1 cho 40 bài và 40 câu chuyện.
-4. Validate toàn bộ glossary/tools/cases song ngữ.
-5. GUI regression test ở BI, VI và EN.
-6. Build EXE và xác nhận file đầu ra.
+2. Validate đủ 40 bài và toàn bộ dữ liệu song ngữ.
+3. GUI regression test ở chế độ BI/VI/EN.
+4. Responsive test ở cửa sổ 1280×760 và 1500×940.
+5. Build EXE và kiểm tra file đầu ra.
 
-Tên EXE: **TuDuyDung_BookApp_V2.7.exe**
+Tên EXE: **TuDuyDung_BookApp_V2.7.1.exe**
