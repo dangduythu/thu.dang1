@@ -10,3 +10,8 @@ V1.4 nâng cấp đồng thời giao diện và chiều sâu nội dung.
 - EXE portable, không mở cửa sổ CMD.
 
 Tên EXE: TuDuyDung_BookApp_V1.4.exe
+
+## V1.4.3
+- Sửa cuộn chuột không ổn định trong vùng nội dung dài.
+- Mouse wheel được định tuyến theo vùng con trỏ, kể cả khi rê trên card/label/button.
+- Giữ cuộn riêng của danh sách mục lục bên trái.
