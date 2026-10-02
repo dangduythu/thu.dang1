@@ -38,6 +38,8 @@ jobs:
         working-directory: tu-duy-dung-bookapp
         shell: python
         run: |
+          import os, sys
+          sys.path.insert(0, os.getcwd())
           from content import CHAPTERS
           valid_styles = {"flow","steps","matrix","compare","ladder","cycle"}
           lessons = [lesson for chapter in CHAPTERS for lesson in chapter["lessons"]]
@@ -48,7 +50,7 @@ jobs:
               assert not missing, f'{lesson.get("id","?")} missing fields: {missing}'
               assert isinstance(lesson["blocks"], list) and lesson["blocks"], f'{lesson["id"]}: blocks must be a non-empty list'
               assert all(isinstance(x,(list,tuple)) and len(x)>=2 for x in lesson["blocks"]), f'{lesson["id"]}: invalid block'
-              assert isinstance(lesson["checklist"], list), f'{lesson["id"]}: checklist must be a list'
+              assert isinstance(lesson["checklist"], list) and lesson["checklist"], f'{lesson["id"]}: checklist must be a non-empty list'
               assert isinstance(lesson["mistakes"], list), f'{lesson["id"]}: mistakes must be a list'
               assert isinstance(lesson["reflect"], list), f'{lesson["id"]}: reflect must be a list'
               assert lesson["style"] in valid_styles, f'{lesson["id"]}: invalid style {lesson["style"]}'
