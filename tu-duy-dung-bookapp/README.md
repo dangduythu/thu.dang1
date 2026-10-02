@@ -1,38 +1,29 @@
-# Tư Duy Đúng – Book App V2.6
+# Tư Duy Đúng / Think Right – Book App V2.7
 
-V2.6 phát triển từ V2.5.1 và tập trung làm mỗi bài học dễ nhớ hơn bằng **một câu chuyện ví dụ cụ thể**.
+V2.7 là bản **song ngữ Việt – Anh toàn bộ chương trình**, phát triển từ V2.6 và giữ nguyên nội dung/tính năng cũ.
 
-## Nội dung và tính năng
-- 10 phần / 40 bài học.
-- Mỗi bài có:
-  - Sơ đồ ghi nhớ.
-  - **Câu chuyện ghi nhớ riêng** với nhân vật/tình huống cụ thể.
-  - Điểm cần nhớ rút ra từ câu chuyện.
-  - Khái niệm.
-  - Cách áp dụng.
-  - Tại sao quan trọng.
-  - Sai lầm thường gặp.
-  - Ví dụ thực tế.
-  - Checklist.
-  - Bài tập áp dụng ngay.
-  - Câu hỏi tự phản tư.
-- Quiz cho đủ 40 bài.
-- 8 Case Study.
-- 15 Thinking & Management Tools.
-- Từ điển 40 thuật ngữ.
-- Dashboard tiến độ.
-- Tìm kiếm, bookmark, đánh dấu đã đọc, chỉnh cỡ chữ.
-- Giữ dữ liệu người dùng tại %APPDATA%\TuDuyDungBookApp\state.json.
-- Giữ fix event-loop của V2.5.1 để tránh treo khi mở Học sách.
-- Cuộn chuột/touchpad theo vùng con trỏ.
+## Điểm mới V2.7
+- Mặc định hiển thị **Song ngữ (BI)**.
+- Có thể chuyển nhanh giữa **BI / VI / EN**.
+- 10 chương và 40 bài học đều có bản tiếng Anh tương ứng.
+- Toàn bộ 40 câu chuyện ghi nhớ được dịch sang tiếng Anh.
+- Sơ đồ ghi nhớ hiển thị song ngữ.
+- Các khối Khái niệm, Cách áp dụng, Tại sao quan trọng, Sai lầm, Ví dụ, Checklist, Bài tập và Reflection đều song ngữ.
+- Quiz song ngữ cho toàn bộ 40 bài.
+- 8 Case Study song ngữ.
+- 15 Thinking & Management Tools song ngữ.
+- Toàn bộ từ điển tích hợp có định nghĩa Việt – Anh.
+- Trang chủ, mục lục, tiến độ, nút điều hướng và thông báo chính được thiết kế lại theo hướng song ngữ.
+- Giữ cơ chế lưu progress/bookmark/quiz/case của các phiên bản trước.
+- Giữ fix cuộn chuột và chống vòng lặp Treeview gây treo.
 
 ## Kiểm thử trước build
-GitHub Actions bắt buộc:
-1. Syntax check.
+GitHub Actions bắt buộc chạy:
+1. Syntax check toàn bộ module.
 2. Validate đủ 10 chương / 40 bài.
-3. Validate đủ **40 câu chuyện**, ID khớp chính xác với 40 bài.
-4. Validate Quiz / Case / Tools / Glossary.
-5. GUI smoke + event-loop regression test.
-6. Build EXE và kiểm tra file đầu ra.
+3. Validate English translation coverage 1:1 cho 40 bài và 40 câu chuyện.
+4. Validate toàn bộ glossary/tools/cases song ngữ.
+5. GUI regression test ở BI, VI và EN.
+6. Build EXE và xác nhận file đầu ra.
 
-Tên EXE: TuDuyDung_BookApp_V2.6.exe
+Tên EXE: **TuDuyDung_BookApp_V2.7.exe**
