@@ -1,6 +1,6 @@
-# Tư Duy Đúng – Book App V2.5
+# Tư Duy Đúng – Book App V2.5.1
 
-V2.5 tích hợp toàn bộ nền tảng các bản trước và bổ sung chế độ học tương tác.
+V2.5.1 tích hợp toàn bộ nền tảng các bản trước và bổ sung chế độ học tương tác.
 
 ## Nội dung và tính năng
 - 10 phần / 40 bài học sâu.
@@ -24,4 +24,10 @@ GitHub Actions bắt buộc chạy:
 4. GUI smoke test trên Windows.
 5. Build EXE và xác nhận file tồn tại, dung lượng hợp lý.
 
-Tên EXE: TuDuyDung_BookApp_V2.5.exe
+Tên EXE: TuDuyDung_BookApp_V2.5.1.exe
+
+## V2.5.1 hotfix
+- Fix treo ứng dụng khi bấm Học sách/đọc bài do vòng lặp TreeviewSelect.
+- Chặn render lesson lồng nhau (re-entrant rendering).
+- Chỉ phát sinh selection event khi bài thực sự thay đổi.
+- GitHub Actions chạy event loop thật nhiều vòng để bắt lỗi treo trước khi build EXE.
