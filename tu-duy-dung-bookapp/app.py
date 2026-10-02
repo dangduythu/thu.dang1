@@ -7,9 +7,10 @@ from tkinter import ttk, messagebox
 
 from content import CHAPTERS
 from learning_data import GLOSSARY, TOOLS, CASES, build_quiz_for_lesson
+from stories import STORIES
 
 APP_NAME = "Tư Duy Đúng – Book App"
-VERSION = "2.5.1"
+VERSION = "2.6"
 APP_DIR = "TuDuyDungBookApp"
 
 BG = "#edf3fb"
@@ -475,6 +476,7 @@ class App(tk.Tk):
         ttk.Button(controls, text="🧠 Quiz bài này", command=lambda: self.show_quiz(lid)).pack(side="left", padx=3)
 
         self._render_diagram(v, lesson, p)
+        self._render_story(v, lesson, p)
 
         row1 = tk.Frame(v, bg=BG); row1.pack(fill="x", pady=(0, 10))
         self._card(row1, "KHÁI NIỆM", lesson.get("concept", ""), p["soft"], p["primary"]).pack(side="left", fill="both", expand=True, padx=(0, 5))
@@ -512,6 +514,24 @@ class App(tk.Tk):
                 self.history_pos = len(self.history) - 1
         self._select_tree(lid)
         self._save_state()
+
+    def _render_story(self, parent, lesson, p):
+        story = STORIES.get(lesson.get("id"))
+        if not story:
+            return
+        box = tk.Frame(parent, bg="white", bd=1, relief="solid", highlightbackground=LINE)
+        box.pack(fill="x", pady=(0, 12))
+        head = tk.Frame(box, bg="#fff7ed")
+        head.pack(fill="x")
+        tk.Label(head, text="📖  CÂU CHUYỆN GHI NHỚ", bg="#fff7ed", fg="#c2410c", font=("Segoe UI", 16, "bold")).pack(side="left", padx=14, pady=10)
+        body = tk.Frame(box, bg="white")
+        body.pack(fill="x", padx=18, pady=14)
+        tk.Label(body, text=story.get("title",""), bg="white", fg=TEXT, font=("Segoe UI", 18, "bold"), wraplength=980, justify="left").pack(anchor="w")
+        tk.Label(body, text=story.get("story",""), bg="white", fg=TEXT, font=("Segoe UI", self.font_size + 1), wraplength=1000, justify="left").pack(anchor="w", pady=(8, 12))
+        memory = tk.Frame(body, bg=p["soft"], bd=1, relief="solid", highlightbackground=LINE)
+        memory.pack(fill="x")
+        tk.Label(memory, text="💡 Điểm cần nhớ", bg=p["soft"], fg=p["primary"], font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=12, pady=(9, 2))
+        tk.Label(memory, text=story.get("memory",""), bg=p["soft"], fg=TEXT, font=("Segoe UI", self.font_size + 1, "bold"), wraplength=950, justify="left").pack(anchor="w", padx=12, pady=(0, 10))
 
     def _render_diagram(self, parent, lesson, p):
         box = tk.Frame(parent, bg="white", bd=1, relief="solid", highlightbackground=LINE)
