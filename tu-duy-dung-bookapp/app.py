@@ -12,7 +12,7 @@ from i18n_en import UI, EN_CHAPTERS, EN_LESSONS
 from i18n_extra import EN_STORIES, EN_GLOSSARY, EN_TOOLS, EN_CASES
 
 APP_NAME = "Tư Duy Đúng / Think Right – Book App"
-VERSION = "2.7.1"
+VERSION = "2.7.2"
 APP_DIR = "TuDuyDungBookApp"
 
 BG = "#edf3fb"
@@ -408,34 +408,17 @@ class App(tk.Tk):
         if sub_vi or sub_en:
             tk.Label(inn,text=self._text(sub_vi,sub_en),bg="white",fg=MUTED,font=("Segoe UI",11),anchor="w",justify="left",wraplength=1050).pack(fill="x",pady=(5,0))
 
-    def _responsive_label(self,parent,text,bg="white",fg=TEXT,font=None,margin=10,min_wrap=180,max_wrap=1100,bullet=False):
-        """Create a label whose wrap length follows the real widget width."""
+    def _static_label(self,parent,text,bg="white",fg=TEXT,font=None,wrap=490,bullet=False):
+        """Stable wrapped label: no <Configure> binding and no after_idle loop."""
         label=tk.Label(
             parent,
             text=("• "+text if bullet else text),
             bg=bg,fg=fg,
             font=font or ("Segoe UI",self.font_size+1),
-            justify="left",anchor="w"
+            justify="left",anchor="w",
+            wraplength=max(180,int(wrap))
         )
         label.pack(anchor="w",fill="x")
-
-        def fit(event=None):
-            try:
-                w=parent.winfo_width()
-                if w<=1 and event is not None:
-                    w=event.width
-                wrap=max(min_wrap,min(max_wrap,w-margin))
-                try:
-                    current=int(float(label.cget("wraplength")))
-                except Exception:
-                    current=-1
-                if current!=wrap:
-                    label.configure(wraplength=wrap)
-            except Exception:
-                pass
-
-        parent.bind("<Configure>",fit,add="+")
-        self.after_idle(fit)
         return label
 
     def _language_badge(self,parent,text,fg,bg="white"):
@@ -443,64 +426,52 @@ class App(tk.Tk):
 
     def _bi_body(self,parent,vi,en,width=490,bg="white"):
         """
-        V2.7.1 responsive bilingual layout.
-        Bilingual text is stacked VI -> EN inside cards instead of forcing
-        two narrow columns. This prevents the English side from being clipped
-        when a card occupies only half of the reading area.
+        Stable bilingual layout for V2.7.2.
+        In BI mode the content is stacked VI -> EN, so each language uses the
+        full card width. No dynamic Configure handlers are used.
         """
+        wrap=max(220,int(width))
         if self.language_mode=="VI":
-            self._responsive_label(parent,vi,bg=bg,margin=8,max_wrap=1200)
+            self._static_label(parent,vi,bg=bg,wrap=wrap)
             return
         if self.language_mode=="EN":
-            self._responsive_label(parent,en,bg=bg,margin=8,max_wrap=1200)
+            self._static_label(parent,en,bg=bg,wrap=wrap)
             return
 
         vi_box=tk.Frame(parent,bg=bg)
         vi_box.pack(fill="x")
         self._language_badge(vi_box,"VI • TIẾNG VIỆT","#2563eb",bg)
-        self._responsive_label(vi_box,vi,bg=bg,margin=8,max_wrap=1200)
+        self._static_label(vi_box,vi,bg=bg,wrap=wrap)
 
-        sep=tk.Frame(parent,bg="#e5e7eb",height=1)
-        sep.pack(fill="x",pady=9)
+        tk.Frame(parent,bg="#e5e7eb",height=1).pack(fill="x",pady=9)
 
         en_box=tk.Frame(parent,bg=bg)
         en_box.pack(fill="x")
         self._language_badge(en_box,"EN • ENGLISH","#7c3aed",bg)
-        self._responsive_label(en_box,en,bg=bg,margin=8,max_wrap=1200)
+        self._static_label(en_box,en,bg=bg,wrap=wrap)
 
     def _card(self,parent,title_vi,title_en,vi,en,hbg="#dbeafe",hfg="#1d4ed8"):
         c=tk.Frame(parent,bg="white",bd=1,relief="solid",highlightbackground=LINE)
         h=tk.Frame(c,bg=hbg); h.pack(fill="x")
         title=self._text(title_vi,title_en).replace("\n"," / ")
-        title_label=tk.Label(h,text=title,bg=hbg,fg=hfg,font=("Segoe UI",14,"bold"),anchor="w",justify="left")
-        title_label.pack(fill="x",padx=14,pady=9)
-        def fit_title(event=None):
-            try:
-                wrap=max(180,h.winfo_width()-28)
-                current=int(float(title_label.cget("wraplength")))
-                if current!=wrap:
-                    title_label.configure(wraplength=wrap)
-            except Exception:
-                pass
-        h.bind("<Configure>",fit_title,add="+")
-        self.after_idle(fit_title)
+        tk.Label(
+            h,text=title,bg=hbg,fg=hfg,font=("Segoe UI",14,"bold"),
+            anchor="w",justify="left",wraplength=520
+        ).pack(fill="x",padx=14,pady=9)
 
         body=tk.Frame(c,bg="white")
         body.pack(fill="both",expand=True,padx=15,pady=13)
-        self._bi_body(body,vi,en)
+        self._bi_body(body,vi,en,width=500)
         return c
 
     def _list_card(self,parent,title_vi,title_en,vi_items,en_items,hbg,hfg):
         c=tk.Frame(parent,bg="white",bd=1,relief="solid",highlightbackground=LINE)
         h=tk.Frame(c,bg=hbg); h.pack(fill="x")
         title=self._text(title_vi,title_en).replace("\n"," / ")
-        title_label=tk.Label(h,text=title,bg=hbg,fg=hfg,font=("Segoe UI",14,"bold"),anchor="w",justify="left")
-        title_label.pack(fill="x",padx=14,pady=9)
-        def fit_title(event=None):
-            try:title_label.configure(wraplength=max(180,h.winfo_width()-28))
-            except Exception:pass
-        h.bind("<Configure>",fit_title,add="+")
-        self.after_idle(fit_title)
+        tk.Label(
+            h,text=title,bg=hbg,fg=hfg,font=("Segoe UI",14,"bold"),
+            anchor="w",justify="left",wraplength=520
+        ).pack(fill="x",padx=14,pady=9)
 
         body=tk.Frame(c,bg="white")
         body.pack(fill="both",expand=True,padx=15,pady=10)
@@ -509,12 +480,12 @@ class App(tk.Tk):
             if badge:
                 self._language_badge(container,badge,badge_fg,"white")
             if not items:
-                self._responsive_label(container,self._text("Chưa có nội dung.","No content yet."),bg="white",fg=MUTED)
+                self._static_label(container,self._text("Chưa có nội dung.","No content yet."),bg="white",fg=MUTED,wrap=500)
                 return
             for item in items:
                 holder=tk.Frame(container,bg="white")
                 holder.pack(fill="x",pady=2)
-                self._responsive_label(holder,str(item),bg="white",bullet=True,margin=8,max_wrap=1200)
+                self._static_label(holder,str(item),bg="white",bullet=True,wrap=500)
 
         if self.language_mode=="VI":
             render_list(body,vi_items)
@@ -538,7 +509,7 @@ class App(tk.Tk):
         hero=tk.Frame(v,bg="white",bd=1,relief="solid",highlightbackground=LINE); hero.pack(fill="x",pady=(0,12))
         inn=tk.Frame(hero,bg="white"); inn.pack(fill="x",padx=28,pady=25)
         tk.Label(inn,text="TƯ DUY ĐÚNG • THINK RIGHT",bg="white",fg="#7a8aa0",font=("Segoe UI",11,"bold")).pack(anchor="w")
-        tk.Label(inn,text="Book App V2.7.1 • Vietnamese – English",bg="white",fg=TEXT,font=("Segoe UI",30,"bold")).pack(anchor="w",pady=(7,3))
+        tk.Label(inn,text="Book App V2.7.2 • Vietnamese – English",bg="white",fg=TEXT,font=("Segoe UI",30,"bold")).pack(anchor="w",pady=(7,3))
         tk.Label(inn,text=self._text("Sách tương tác song ngữ: đọc – hiểu – nhớ – áp dụng.","A bilingual interactive book: read – understand – remember – apply."),bg="white",fg=MUTED,font=("Segoe UI",12),justify="left").pack(anchor="w")
         actions=tk.Frame(inn,bg="white"); actions.pack(anchor="w",pady=(15,0))
         ttk.Button(actions,text="▶ "+self._ui("continue"),command=self.continue_reading).pack(side="left")
