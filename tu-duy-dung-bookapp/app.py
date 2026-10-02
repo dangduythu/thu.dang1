@@ -425,7 +425,12 @@ class App(tk.Tk):
                 if w<=1 and event is not None:
                     w=event.width
                 wrap=max(min_wrap,min(max_wrap,w-margin))
-                label.configure(wraplength=wrap)
+                try:
+                    current=int(float(label.cget("wraplength")))
+                except Exception:
+                    current=-1
+                if current!=wrap:
+                    label.configure(wraplength=wrap)
             except Exception:
                 pass
 
@@ -470,8 +475,13 @@ class App(tk.Tk):
         title_label=tk.Label(h,text=title,bg=hbg,fg=hfg,font=("Segoe UI",14,"bold"),anchor="w",justify="left")
         title_label.pack(fill="x",padx=14,pady=9)
         def fit_title(event=None):
-            try:title_label.configure(wraplength=max(180,h.winfo_width()-28))
-            except Exception:pass
+            try:
+                wrap=max(180,h.winfo_width()-28)
+                current=int(float(title_label.cget("wraplength")))
+                if current!=wrap:
+                    title_label.configure(wraplength=wrap)
+            except Exception:
+                pass
         h.bind("<Configure>",fit_title,add="+")
         self.after_idle(fit_title)
 
