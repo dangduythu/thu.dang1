@@ -528,7 +528,7 @@ class App(tk.Tk):
         hero=tk.Frame(v,bg="white",bd=1,relief="solid",highlightbackground=LINE); hero.pack(fill="x",pady=(0,12))
         inn=tk.Frame(hero,bg="white"); inn.pack(fill="x",padx=28,pady=25)
         tk.Label(inn,text="TƯ DUY ĐÚNG • THINK RIGHT",bg="white",fg="#7a8aa0",font=("Segoe UI",11,"bold")).pack(anchor="w")
-        tk.Label(inn,text="Book App V2.7 • Vietnamese – English",bg="white",fg=TEXT,font=("Segoe UI",30,"bold")).pack(anchor="w",pady=(7,3))
+        tk.Label(inn,text="Book App V2.7.1 • Vietnamese – English",bg="white",fg=TEXT,font=("Segoe UI",30,"bold")).pack(anchor="w",pady=(7,3))
         tk.Label(inn,text=self._text("Sách tương tác song ngữ: đọc – hiểu – nhớ – áp dụng.","A bilingual interactive book: read – understand – remember – apply."),bg="white",fg=MUTED,font=("Segoe UI",12),justify="left").pack(anchor="w")
         actions=tk.Frame(inn,bg="white"); actions.pack(anchor="w",pady=(15,0))
         ttk.Button(actions,text="▶ "+self._ui("continue"),command=self.continue_reading).pack(side="left")
