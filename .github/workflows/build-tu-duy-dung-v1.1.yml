@@ -48,19 +48,19 @@ jobs:
       - name: Build portable EXE
         working-directory: tu-duy-dung-bookapp
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.7.1.1" app.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.7.1" app.py
 
       - name: Verify EXE exists
         shell: powershell
         run: |
-          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.1.exe")) { throw "EXE not found" }
-          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.1.exe").Length
+          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.exe")) { throw "EXE not found" }
+          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.exe").Length
           if ($size -lt 1000000) { throw "EXE size looks invalid: $size" }
           Write-Host "EXE size: $size bytes"
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_BookApp_V2.7.1.1_Windows
-          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.1.exe
+          name: TuDuyDung_BookApp_V2.7.1_Windows
+          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.exe
           if-no-files-found: error
