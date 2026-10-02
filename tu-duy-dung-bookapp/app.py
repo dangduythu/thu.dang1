@@ -9,7 +9,7 @@ from content import CHAPTERS
 from learning_data import GLOSSARY, TOOLS, CASES, build_quiz_for_lesson
 
 APP_NAME = "Tư Duy Đúng – Book App"
-VERSION = "2.5"
+VERSION = "2.5.1"
 APP_DIR = "TuDuyDungBookApp"
 
 BG = "#edf3fb"
@@ -279,21 +279,34 @@ class App(tk.Tk):
         self._update_progress_label()
 
     def _tree_pick(self, _event=None):
+        # TreeviewSelect is also emitted by programmatic selection_set().
+        # Never re-open the lesson that is already being rendered; otherwise
+        # show_lesson -> _select_tree -> TreeviewSelect can recurse forever.
         if self.block_tree_event:
             return
         sel = self.tree.selection()
         if not sel or not sel[0].startswith("l"):
             return
         lid = sel[0][1:]
-        if lid in self.lesson_by_id:
-            self.show_lesson(lid)
+        if lid not in self.lesson_by_id:
+            return
+        if self.current_view == "lesson" and lid == self.current_lesson:
+            return
+        self.show_lesson(lid)
 
     def _select_tree(self, lid):
         iid = "l" + lid
-        if self.tree.exists(iid):
-            self.block_tree_event = True
+        if not self.tree.exists(iid):
+            return
+        # Avoid generating redundant virtual selection events.
+        if self.tree.selection() == (iid,):
+            self.tree.see(iid)
+            return
+        self.block_tree_event = True
+        try:
             self.tree.selection_set(iid)
             self.tree.see(iid)
+        finally:
             self.block_tree_event = False
 
     def search_lessons(self):
@@ -425,6 +438,15 @@ class App(tk.Tk):
     def show_lesson(self, lid, add_history=True):
         if lid not in self.lesson_by_id:
             return
+        if getattr(self, "_rendering_lesson", False):
+            return
+        self._rendering_lesson = True
+        try:
+            self._show_lesson_impl(lid, add_history)
+        finally:
+            self._rendering_lesson = False
+
+    def _show_lesson_impl(self, lid, add_history=True):
         self.current_lesson = lid
         self.last_lesson = lid
         self._activate_view("lesson")
