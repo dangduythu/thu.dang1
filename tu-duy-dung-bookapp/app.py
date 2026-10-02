@@ -305,7 +305,7 @@ class App(tk.Tk):
         for l in self.lessons:
             blob = " ".join([
                 l.get("id", ""), l.get("title", ""), l.get("summary", ""), l.get("concept", ""),
-                l.get("apply", ""), l.get("example", ""), l.get("why", ""), l.get("practice", ""),
+                l.get("apply", l.get("method", "")), l.get("example", ""), l.get("why", ""), l.get("practice", ""),
                 " ".join(l.get("mistakes", [])), " ".join(l.get("reflect", [])),
             ]).lower()
             if q in blob:
@@ -456,7 +456,7 @@ class App(tk.Tk):
 
         row1 = tk.Frame(v, bg=BG); row1.pack(fill="x", pady=(0, 10))
         self._card(row1, "KHÁI NIỆM", lesson.get("concept", ""), p["soft"], p["primary"]).pack(side="left", fill="both", expand=True, padx=(0, 5))
-        self._card(row1, "CÁCH ÁP DỤNG", lesson.get("apply", ""), p["accent2"], p["accent"]).pack(side="left", fill="both", expand=True, padx=(5, 0))
+        self._card(row1, "CÁCH ÁP DỤNG", lesson.get("apply", lesson.get("method", "")), p["accent2"], p["accent"]).pack(side="left", fill="both", expand=True, padx=(5, 0))
 
         row2 = tk.Frame(v, bg=BG); row2.pack(fill="x", pady=(0, 10))
         self._card(row2, "TẠI SAO QUAN TRỌNG?", lesson.get("why", ""), "#fff7ed", "#c2410c").pack(side="left", fill="both", expand=True, padx=(0, 5))
