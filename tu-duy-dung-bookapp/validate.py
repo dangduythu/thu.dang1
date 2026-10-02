@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from content import CHAPTERS
 from learning_data import GLOSSARY, TOOLS, CASES, build_quiz_for_lesson
+from stories import STORIES
 
 VALID_STYLES={"flow","steps","matrix","compare","ladder","cycle"}
 lessons=[l for c in CHAPTERS for l in c["lessons"]]
@@ -8,6 +9,7 @@ assert len(CHAPTERS)==10, f"Expected 10 chapters, got {len(CHAPTERS)}"
 assert len(lessons)==40, f"Expected 40 lessons, got {len(lessons)}"
 ids=[l["id"] for l in lessons]
 assert len(ids)==len(set(ids)), "Duplicate lesson ids"
+
 required=["id","title","summary","concept","example","checklist","blocks","style","why","mistakes","practice","reflect"]
 for l in lessons:
     miss=[k for k in required if k not in l]
@@ -30,6 +32,13 @@ for l in lessons:
         assert len(q["options"])>=3, f"{l['id']} quiz options"
         assert 0 <= q["answer"] < len(q["options"]), f"{l['id']} invalid answer"
 
+assert len(STORIES)==40, f"Expected 40 stories, got {len(STORIES)}"
+assert set(STORIES.keys())==set(ids), "Story IDs must match lesson IDs exactly"
+for sid,s in STORIES.items():
+    assert s.get("title","").strip(), f"{sid} story title missing"
+    assert len(s.get("story","").strip())>=120, f"{sid} story too short"
+    assert s.get("memory","").strip(), f"{sid} memory point missing"
+
 assert len(GLOSSARY)>=35, "Glossary too small"
 assert len(TOOLS)>=12, "Tool library too small"
 assert len({t['id'] for t in TOOLS})==len(TOOLS), "Duplicate tool ids"
@@ -38,4 +47,4 @@ assert len({c['id'] for c in CASES})==len(CASES), "Duplicate case ids"
 for c in CASES:
     assert len(c['options'])>=3 and 0<=c['answer']<len(c['options']), f"Bad case {c['id']}"
 
-print(f"Validated V2.5: {len(CHAPTERS)} chapters, {len(lessons)} lessons, {len(TOOLS)} tools, {len(CASES)} cases, {len(GLOSSARY)} glossary terms.")
+print(f"Validated V2.6: {len(CHAPTERS)} chapters, {len(lessons)} lessons, {len(STORIES)} stories, {len(TOOLS)} tools, {len(CASES)} cases, {len(GLOSSARY)} glossary terms.")
