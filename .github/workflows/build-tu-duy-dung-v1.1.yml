@@ -1,4 +1,4 @@
-name: Build Tu Duy Dung Book App V2.7
+name: Build Tu Duy Dung Book App V2.7.1
 
 on:
   workflow_dispatch:
@@ -34,33 +34,33 @@ jobs:
         run: |
           python -m py_compile app.py content.py stories.py learning_data.py i18n_en.py i18n_extra.py validate.py
 
-      - name: Validate all V2.7 bilingual data
+      - name: Validate all V2.7.1 bilingual data
         working-directory: tu-duy-dung-bookapp
         run: |
           python validate.py
 
-      - name: GUI bilingual regression test
+      - name: GUI bilingual responsive-layout regression test
         working-directory: tu-duy-dung-bookapp
         shell: powershell
         run: |
-          python -c "import app; a=app.App(); a.update(); assert a.language_mode in ('BI','VI','EN'); a.language_mode='BI'; a.show_home(); a.update(); a.show_lesson('1.1'); [a.update() for _ in range(4)]; assert a.current_view=='lesson'; assert not a._rendering_lesson; a.show_lesson('6.1'); [a.update() for _ in range(4)]; a.show_quiz('1.2'); a.update(); a.show_cases(); a.update(); a.show_tools(); a.update(); a.show_glossary(); a.update(); a.show_progress(); a.update(); a.language_mode='EN'; a.show_lesson('8.1'); a.update(); a.language_mode='VI'; a.show_lesson('10.4'); a.update(); a.destroy(); print('V2.7 bilingual GUI regression test OK')"
+          python -c "import app; a=app.App(); a.geometry('1280x760'); [a.update() for _ in range(3)]; assert a.language_mode in ('BI','VI','EN'); a.language_mode='BI'; a.show_lesson('1.1'); [a.update() for _ in range(6)]; assert a.current_view=='lesson'; assert not a._rendering_lesson; a.geometry('1500x940'); [a.update() for _ in range(4)]; a.show_lesson('6.1'); [a.update() for _ in range(4)]; a.show_quiz('1.2'); a.update(); a.show_cases(); a.update(); a.show_tools(); a.update(); a.show_glossary(); a.update(); a.show_progress(); a.update(); a.language_mode='EN'; a.show_lesson('8.1'); [a.update() for _ in range(3)]; a.language_mode='VI'; a.show_lesson('10.4'); [a.update() for _ in range(3)]; a.destroy(); print('V2.7.1 responsive bilingual GUI regression test OK')"
 
       - name: Build portable EXE
         working-directory: tu-duy-dung-bookapp
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.7" app.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.7.1.1" app.py
 
       - name: Verify EXE exists
         shell: powershell
         run: |
-          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.exe")) { throw "EXE not found" }
-          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.exe").Length
+          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.1.exe")) { throw "EXE not found" }
+          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.1.exe").Length
           if ($size -lt 1000000) { throw "EXE size looks invalid: $size" }
           Write-Host "EXE size: $size bytes"
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_BookApp_V2.7_Windows
-          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.exe
+          name: TuDuyDung_BookApp_V2.7.1.1_Windows
+          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.1.1.exe
           if-no-files-found: error
