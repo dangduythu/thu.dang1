@@ -1,4 +1,4 @@
-name: Build Tu Duy Dung Book App V1.4.3
+name: Build Tu Duy Dung Book App V2.5
 
 on:
   workflow_dispatch:
@@ -32,38 +32,35 @@ jobs:
       - name: Syntax check
         working-directory: tu-duy-dung-bookapp
         run: |
-          python -m py_compile app.py content.py
+          python -m py_compile app.py content.py learning_data.py validate.py
 
-      - name: Validate lesson data
+      - name: Validate all V2.5 learning data
         working-directory: tu-duy-dung-bookapp
-        shell: python
         run: |
-          import os, sys
-          sys.path.insert(0, os.getcwd())
-          from content import CHAPTERS
-          valid_styles = {"flow","steps","matrix","compare","ladder","cycle"}
-          lessons = [lesson for chapter in CHAPTERS for lesson in chapter["lessons"]]
-          assert len(lessons) == 40, f"Expected 40 lessons, got {len(lessons)}"
-          required = ["id","title","summary","concept","method","example","checklist","blocks","style","why","mistakes","practice","reflect"]
-          for lesson in lessons:
-              missing = [k for k in required if k not in lesson]
-              assert not missing, f'{lesson.get("id","?")} missing fields: {missing}'
-              assert isinstance(lesson["blocks"], list) and lesson["blocks"], f'{lesson["id"]}: blocks must be a non-empty list'
-              assert all(isinstance(x,(list,tuple)) and len(x)>=2 for x in lesson["blocks"]), f'{lesson["id"]}: invalid block'
-              assert isinstance(lesson["checklist"], list) and lesson["checklist"], f'{lesson["id"]}: checklist must be a non-empty list'
-              assert isinstance(lesson["mistakes"], list), f'{lesson["id"]}: mistakes must be a list'
-              assert isinstance(lesson["reflect"], list), f'{lesson["id"]}: reflect must be a list'
-              assert lesson["style"] in valid_styles, f'{lesson["id"]}: invalid style {lesson["style"]}'
-          print(f"Validated {len(lessons)} lessons successfully")
+          python validate.py
+
+      - name: GUI smoke test
+        working-directory: tu-duy-dung-bookapp
+        shell: powershell
+        run: |
+          python -c "import app; a=app.App(); a.update_idletasks(); a.show_lesson('1.1'); a.update_idletasks(); a.show_lesson('6.1'); a.update_idletasks(); a.show_quiz('1.2'); a.update_idletasks(); a.show_cases(); a.update_idletasks(); a.show_tools(); a.update_idletasks(); a.show_glossary(); a.update_idletasks(); a.show_progress(); a.update_idletasks(); a.destroy(); print('GUI smoke test OK')"
 
       - name: Build portable EXE
         working-directory: tu-duy-dung-bookapp
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V1.4.3" app.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.5" app.py
+
+      - name: Verify EXE exists
+        shell: powershell
+        run: |
+          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.5.exe")) { throw "EXE not found" }
+          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.5.exe").Length
+          if ($size -lt 1000000) { throw "EXE size looks invalid: $size" }
+          Write-Host "EXE size: $size bytes"
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_BookApp_V1.4.3_Windows
-          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V1.4.3.exe
+          name: TuDuyDung_BookApp_V2.5_Windows
+          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.5.exe
           if-no-files-found: error
