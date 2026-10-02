@@ -8,13 +8,14 @@ assert len(CHAPTERS)==10, f"Expected 10 chapters, got {len(CHAPTERS)}"
 assert len(lessons)==40, f"Expected 40 lessons, got {len(lessons)}"
 ids=[l["id"] for l in lessons]
 assert len(ids)==len(set(ids)), "Duplicate lesson ids"
-required=["id","title","summary","concept","apply","example","checklist","blocks","style","why","mistakes","practice","reflect"]
+required=["id","title","summary","concept","example","checklist","blocks","style","why","mistakes","practice","reflect"]
 for l in lessons:
     miss=[k for k in required if k not in l]
     assert not miss, f"{l.get('id','?')} missing {miss}"
     assert l["title"].strip(), f"{l['id']} empty title"
     assert l["concept"].strip(), f"{l['id']} empty concept"
-    assert l["apply"].strip(), f"{l['id']} empty apply"
+    apply_text=l.get("apply", l.get("method", ""))
+    assert isinstance(apply_text,str) and apply_text.strip(), f"{l['id']} empty apply/method"
     assert l["example"].strip(), f"{l['id']} empty example"
     assert isinstance(l["checklist"],list) and len(l["checklist"])>=3, f"{l['id']} invalid checklist"
     assert isinstance(l["blocks"],list) and len(l["blocks"])>=3, f"{l['id']} invalid blocks"
