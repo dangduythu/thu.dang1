@@ -235,6 +235,7 @@ class App(tk.Tk):
         top = tk.Frame(self, bg="white", height=74)
         top.pack(fill="x")
         top.pack_propagate(False)
+        self.topbar = top
         brand = tk.Frame(top, bg="white")
         brand.pack(side="left", padx=(18, 6))
         tk.Label(brand, text="TƯ DUY ĐÚNG", bg="white", fg=NAVY, font=("Segoe UI", 19, "bold")).pack(anchor="w")
@@ -242,12 +243,17 @@ class App(tk.Tk):
 
         nav = tk.Frame(top, bg="white")
         nav.pack(side="right", padx=12)
-        for key, cmd in [
-            ("home", self.show_home), ("read", self.continue_reading), ("quiz", self.show_quiz),
-            ("cases", self.show_cases), ("tools", self.show_tools), ("glossary", self.show_glossary),
-            ("progress", self.show_progress)
+        for label, cmd in [
+            (self._ui("home"), self.show_home),
+            (self._ui("read"), self.continue_reading),
+            (self._ui("quiz"), self.show_quiz),
+            (self._ui("cases"), self.show_cases),
+            (self._text("Ôn tập","Review").replace("\n"," / "), self.show_review),
+            (self._text("Workbench","Workbench"), self.show_workbench),
+            (self._ui("tools"), self.show_tools),
+            (self._ui("progress"), self.show_progress)
         ]:
-            ttk.Button(nav, text=self._ui(key), command=cmd, style="Nav.TButton").pack(side="left", padx=2, pady=16)
+            ttk.Button(nav, text=label, command=cmd, style="Nav.TButton").pack(side="left", padx=2, pady=16)
         ttk.Button(nav, text="A−", width=4, command=lambda: self.change_font(-1)).pack(side="left", padx=(6,2), pady=16)
         ttk.Button(nav, text="A+", width=4, command=lambda: self.change_font(1)).pack(side="left", padx=2, pady=16)
         self.lang_combo = ttk.Combobox(nav, values=["BI", "VI", "EN"], textvariable=self.language_var, state="readonly", width=4)
@@ -256,6 +262,7 @@ class App(tk.Tk):
 
         body = tk.Frame(self, bg=BG)
         body.pack(fill="both", expand=True)
+        self.body = body
         self.sidebar = tk.Frame(body, bg="white", width=340)
         self.sidebar.pack(side="left", fill="y", padx=(10,8), pady=10)
         self.sidebar.pack_propagate(False)
@@ -264,7 +271,7 @@ class App(tk.Tk):
 
         self._build_sidebar()
         self.views = {}
-        for name in ["home","lesson","quiz","cases","tools","glossary","progress"]:
+        for name in ["home","lesson","quiz","cases","tools","glossary","progress","review","workbench","notes"]:
             self.views[name] = ScrollableFrame(self.main, BG)
 
     def _build_sidebar(self):
