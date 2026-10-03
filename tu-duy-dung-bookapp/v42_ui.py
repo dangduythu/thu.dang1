@@ -166,6 +166,7 @@ class V42Mixin:
         self.show_review()
 
     def show_case_lab(self,case_id=None,reset=False):
+        self.case_mode="lab"
         if case_id and any(x["id"]==case_id for x in MULTI_CASES):self.current_multi_case=case_id
         if reset or not hasattr(self,"multi_step_index"):
             self.multi_step_index=0; self.multi_score=0
