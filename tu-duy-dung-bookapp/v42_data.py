@@ -184,7 +184,8 @@ WORKBENCH_TEMPLATES = [
             ("options","Options (comma separated)"),
             ("criteria","Criteria (comma separated)"),
             ("weights","Weights (comma separated, e.g. 40,30,30)"),
-            ("notes","Scores / evidence notes"),
+            ("scores","Scores: one option per row separated by ';' (e.g. 8,7,9;7,9,8)"),
+            ("notes","Evidence notes"),
             ("risk","Residual risk / sensitivity notes")
         ]
     },
