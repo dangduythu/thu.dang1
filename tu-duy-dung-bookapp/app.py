@@ -577,6 +577,9 @@ class App(tk.Tk):
 
     def show_lesson(self,lid):
         if lid not in self.lesson_by_id or self._rendering_lesson:return
+        if self.current_view=="lesson" and self.current_lesson in self.lesson_by_id:
+            try:self.lesson_scroll[self.current_lesson]=float(self.views["lesson"].canvas.yview()[0])
+            except Exception:pass
         self._rendering_lesson=True
         try:self._show_lesson_impl(lid)
         finally:self._rendering_lesson=False
@@ -599,6 +602,8 @@ class App(tk.Tk):
         ttk.Button(controls,textvariable=self.bookmark_var,command=self.toggle_bookmark).pack(side="left",padx=3)
         ttk.Button(controls,text="✓ "+self._ui("mark_read"),command=self.mark_read).pack(side="left",padx=3)
         ttk.Button(controls,text=self._ui("lesson_quiz"),command=lambda:self.show_quiz(lid)).pack(side="left",padx=3)
+        ttk.Button(controls,text=self._text("📝 Ghi chú","📝 Notes").replace("\n"," / "),command=lambda:self.show_notes(lid)).pack(side="left",padx=3)
+        ttk.Button(controls,text=self._text("⛶ Tập trung","⛶ Focus").replace("\n"," / "),command=self.toggle_focus_mode).pack(side="left",padx=3)
 
         self._render_diagram(v,vi,en,p)
         self._render_story(v,lid,p)
@@ -633,6 +638,9 @@ class App(tk.Tk):
 
         self._select_tree(lid)
         self._save_state()
+        pos=float(self.lesson_scroll.get(lid,0.0) or 0.0)
+        if pos>0:
+            self.after_idle(lambda p=pos:self.views["lesson"].canvas.yview_moveto(p))
 
     def _english_checklist(self,en):
         out=[]
