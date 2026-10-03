@@ -78,39 +78,68 @@ CASES = [
 
 
 def build_quiz_for_lesson(lesson, all_lessons):
-    """Create deterministic, schema-safe review questions from each lesson."""
+    """Create four deterministic review questions for every lesson."""
     blocks = lesson.get("blocks") or []
     q = []
-    if blocks:
-        first = blocks[0]
-        distractors = [b[1] for b in blocks[1:4]]
+
+    def other_values(field):
+        vals=[]
         for other in all_lessons:
-            if len(distractors) >= 3:
-                break
-            ob = other.get("blocks") or []
-            if other.get("id") != lesson.get("id") and ob:
-                val = ob[0][1]
-                if val != first[1] and val not in distractors:
-                    distractors.append(val)
-        options = [first[1]] + distractors[:3]
+            if other.get("id")==lesson.get("id"):
+                continue
+            value=other.get(field)
+            if isinstance(value,str) and value.strip() and value not in vals:
+                vals.append(value)
+        return vals
+
+    if blocks:
+        first=blocks[0]
+        distractors=[b[1] for b in blocks[1:4]]
+        for other in all_lessons:
+            if len(distractors)>=3: break
+            ob=other.get("blocks") or []
+            if other.get("id")!=lesson.get("id") and ob:
+                val=ob[0][1]
+                if val!=first[1] and val not in distractors:distractors.append(val)
         q.append({
-            "question": f'Trong bài “{lesson["title"]}”, {first[0]} được hiểu gần nhất là gì?',
-            "options": options,
-            "answer": 0,
-            "explain": f'{first[0]}: {first[1]}',
+            "question":f'Trong bài “{lesson["title"]}”, {first[0]} được hiểu gần nhất là gì?',
+            "options":[first[1]]+distractors[:3],
+            "answer":0,
+            "explain":f'{first[0]}: {first[1]}',
         })
-    mistakes = lesson.get("mistakes") or []
+
+    mistakes=lesson.get("mistakes") or []
     if mistakes:
-        correct = mistakes[0]
-        distractors = []
-        for text in (lesson.get("reflect") or []) + (lesson.get("checklist") or []):
-            if text != correct and text not in distractors:
-                distractors.append(text)
-        distractors += ["Luôn yêu cầu thêm dữ liệu dù quyết định không thay đổi", "Chỉ làm theo thói quen mà không xác định mục tiêu"]
+        correct=mistakes[0]
+        distractors=[]
+        for text in (lesson.get("reflect") or [])+(lesson.get("checklist") or []):
+            if text!=correct and text not in distractors:distractors.append(text)
+        distractors += ["Luôn yêu cầu thêm dữ liệu dù quyết định không thay đổi","Chỉ làm theo thói quen mà không xác định mục tiêu"]
         q.append({
-            "question": f'Đâu là một sai lầm thường gặp khi áp dụng “{lesson["title"]}”?',
-            "options": [correct] + distractors[:3],
-            "answer": 0,
-            "explain": correct,
+            "question":f'Đâu là một sai lầm thường gặp khi áp dụng “{lesson["title"]}”?',
+            "options":[correct]+distractors[:3],
+            "answer":0,
+            "explain":correct,
         })
-    return q[:2]
+
+    why=lesson.get("why","")
+    if why:
+        distractors=other_values("why")[:3]
+        q.append({
+            "question":f'Vì sao “{lesson["title"]}” quan trọng?',
+            "options":[why]+distractors,
+            "answer":0,
+            "explain":why,
+        })
+
+    practice=lesson.get("practice","")
+    if practice:
+        distractors=other_values("practice")[:3]
+        q.append({
+            "question":f'Bài tập áp dụng phù hợp nhất với “{lesson["title"]}” là gì?',
+            "options":[practice]+distractors,
+            "answer":0,
+            "explain":practice,
+        })
+
+    return q[:4]
