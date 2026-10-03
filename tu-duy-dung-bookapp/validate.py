@@ -4,6 +4,7 @@ from stories import STORIES
 from learning_data import GLOSSARY, TOOLS, CASES, build_quiz_for_lesson
 from i18n_en import UI, EN_CHAPTERS, EN_LESSONS
 from i18n_extra import EN_STORIES, EN_GLOSSARY, EN_TOOLS, EN_CASES
+from v42_data import MULTI_CASES, WORKBENCH_TEMPLATES, default_review_state, flashcard_for_lesson
 
 VALID_STYLES={"flow","steps","matrix","compare","ladder","cycle"}
 lessons=[l for c in CHAPTERS for l in c["lessons"]]
@@ -29,11 +30,13 @@ for l in lessons:
     assert l["practice"].strip(), f"{l['id']} no practice"
     assert isinstance(l["reflect"],list) and l["reflect"], f"{l['id']} no reflect"
     quiz=build_quiz_for_lesson(l,lessons)
-    assert len(quiz)>=2, f"{l['id']} quiz missing"
+    assert len(quiz)==4, f"{l['id']} expected 4 quiz questions, got {len(quiz)}"
+    for q in quiz:
+        assert len(q["options"])>=4, f"{l['id']} quiz options"
+        assert 0 <= q["answer"] < len(q["options"]), f"{l['id']} invalid answer"
 
 assert len(STORIES)==40 and set(STORIES)==set(ids), "Vietnamese stories mismatch"
 
-# V2.7 bilingual coverage
 assert set(EN_CHAPTERS)==set(range(1,11)), "English chapter translations incomplete"
 assert set(EN_LESSONS)==set(ids), "English lesson IDs must match all 40 lessons"
 assert set(EN_STORIES)==set(ids), "English story IDs must match all 40 lessons"
@@ -48,6 +51,9 @@ for lid in ids:
     assert isinstance(e["reflect"],list) and e["reflect"], f"{lid} EN reflect missing"
     s=EN_STORIES[lid]
     assert s["title"].strip() and len(s["story"].strip())>=120 and s["memory"].strip(), f"{lid} EN story invalid"
+    vi=next(l for l in lessons if l["id"]==lid)
+    fc=flashcard_for_lesson(vi,e)
+    assert fc["front_vi"] and fc["front_en"] and fc["back_vi"] and fc["back_en"], f"{lid} flashcard invalid"
 
 assert set(EN_GLOSSARY)==set(GLOSSARY), "English glossary coverage mismatch"
 tool_ids={t["id"] for t in TOOLS}
@@ -64,4 +70,22 @@ for cid in case_ids:
     assert e["title"].strip() and e["situation"].strip() and e["question"].strip(), f"{cid} EN case invalid"
     assert len(e["options"])>=3 and 0<=e["answer"]<len(e["options"]), f"{cid} EN case options invalid"
 
-print(f"Validated V2.7 bilingual edition: 10 chapters, {len(lessons)} lessons, 40 stories, {len(TOOLS)} tools, {len(CASES)} cases, {len(GLOSSARY)} glossary terms.")
+assert len(MULTI_CASES)>=3, "Need at least 3 multi-step cases"
+assert len({x["id"] for x in MULTI_CASES})==len(MULTI_CASES), "Duplicate multi-step case ids"
+for case in MULTI_CASES:
+    assert case["title_vi"].strip() and case["title_en"].strip(), f'{case["id"]} missing title'
+    assert len(case["steps"])>=2, f'{case["id"]} needs multiple steps'
+    for step in case["steps"]:
+        assert len(step["options_vi"])==len(step["options_en"])>=3, f'{case["id"]} bad options'
+        assert 0<=step["answer"]<len(step["options_vi"]), f'{case["id"]} bad answer'
+
+assert len(WORKBENCH_TEMPLATES)>=7, "Workbench template coverage too small"
+wb_ids={x["id"] for x in WORKBENCH_TEMPLATES}
+assert {"5why","pdca","a3","raci","risk","decision","skill"}.issubset(wb_ids), "Missing V4.2 workbench tools"
+for t in WORKBENCH_TEMPLATES:
+    assert t["fields"] and all(len(x)==2 for x in t["fields"]), f'{t["id"]} invalid workbench fields'
+
+review=default_review_state(ids)
+assert len(review)==40 and all("level" in x and "due" in x and "reviews" in x for x in review.values()), "Review state invalid"
+
+print(f"Validated V4.2: 10 chapters, {len(lessons)} lessons, 4-question quizzes, 40 stories, {len(MULTI_CASES)} multi-step cases, {len(WORKBENCH_TEMPLATES)} workbench tools, {len(TOOLS)} reference tools, {len(GLOSSARY)} glossary terms.")
