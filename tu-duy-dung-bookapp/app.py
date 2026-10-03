@@ -2,17 +2,19 @@
 import json
 import os
 from pathlib import Path
+from datetime import date
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 
 from content import CHAPTERS
 from stories import STORIES
 from learning_data import GLOSSARY, TOOLS, CASES, build_quiz_for_lesson
 from i18n_en import UI, EN_CHAPTERS, EN_LESSONS
 from i18n_extra import EN_STORIES, EN_GLOSSARY, EN_TOOLS, EN_CASES
+from v42_data import MULTI_CASES, WORKBENCH_TEMPLATES, default_review_state, next_review, flashcard_for_lesson
 
 APP_NAME = "Tư Duy Đúng / Think Right – Book App"
-VERSION = "2.7.2"
+VERSION = "4.2"
 APP_DIR = "TuDuyDungBookApp"
 
 BG = "#edf3fb"
@@ -39,40 +41,51 @@ def state_path():
 
 
 def build_quiz_en(lesson_id):
-    l = EN_LESSONS[lesson_id]
-    q = []
-    blocks = l.get("blocks", [])
+    """Four deterministic English review questions per lesson."""
+    l=EN_LESSONS[lesson_id]
+    q=[]
+    blocks=l.get("blocks",[])
+
+    def other_values(field):
+        vals=[]
+        for oid,other in EN_LESSONS.items():
+            if oid==lesson_id: continue
+            value=other.get(field)
+            if isinstance(value,str) and value.strip() and value not in vals:
+                vals.append(value)
+        return vals
+
     if blocks:
-        correct = blocks[0][1]
-        distractors = [b[1] for b in blocks[1:4]]
-        for oid, other in EN_LESSONS.items():
-            if oid == lesson_id or len(distractors) >= 3:
-                continue
-            ob = other.get("blocks", [])
-            if ob:
-                val = ob[0][1]
-                if val != correct and val not in distractors:
-                    distractors.append(val)
-        q.append({
-            "question": f'In “{l["title"]}”, what best describes {blocks[0][0]}?',
-            "options": [correct] + distractors[:3],
-            "answer": 0,
-            "explain": f'{blocks[0][0]}: {blocks[0][1]}',
-        })
-    mistakes = l.get("mistakes", [])
+        correct=blocks[0][1]
+        distractors=[b[1] for b in blocks[1:4]]
+        for oid,other in EN_LESSONS.items():
+            if len(distractors)>=3: break
+            ob=other.get("blocks",[])
+            if oid!=lesson_id and ob:
+                val=ob[0][1]
+                if val!=correct and val not in distractors:distractors.append(val)
+        q.append({"question":f'In “{l["title"]}”, what best describes {blocks[0][0]}?',
+                  "options":[correct]+distractors[:3],"answer":0,"explain":f'{blocks[0][0]}: {correct}'})
+
+    mistakes=l.get("mistakes",[])
     if mistakes:
-        correct = mistakes[0]
-        distractors = []
-        for text in l.get("reflect", []) + ["Always wait for perfect data before deciding", "Follow habit without defining the objective"]:
-            if text != correct and text not in distractors:
-                distractors.append(text)
-        q.append({
-            "question": f'Which is a common mistake when applying “{l["title"]}”?',
-            "options": [correct] + distractors[:3],
-            "answer": 0,
-            "explain": correct,
-        })
-    return q[:2]
+        correct=mistakes[0]
+        distractors=[]
+        for text in l.get("reflect",[])+["Always wait for perfect data before deciding","Follow habit without defining the objective","Use activity as the outcome"]:
+            if text!=correct and text not in distractors:distractors.append(text)
+        q.append({"question":f'Which is a common mistake when applying “{l["title"]}”?',
+                  "options":[correct]+distractors[:3],"answer":0,"explain":correct})
+
+    why=l.get("why","")
+    if why:
+        q.append({"question":f'Why does “{l["title"]}” matter?',
+                  "options":[why]+other_values("why")[:3],"answer":0,"explain":why})
+
+    practice=l.get("practice","")
+    if practice:
+        q.append({"question":f'Which exercise best applies “{l["title"]}”?',
+                  "options":[practice]+other_values("practice")[:3],"answer":0,"explain":practice})
+    return q[:4]
 
 
 class ScrollableFrame(tk.Frame):
@@ -207,7 +220,7 @@ class App(tk.Tk):
         brand = tk.Frame(top, bg="white")
         brand.pack(side="left", padx=(18, 6))
         tk.Label(brand, text="TƯ DUY ĐÚNG", bg="white", fg=NAVY, font=("Segoe UI", 19, "bold")).pack(anchor="w")
-        tk.Label(brand, text="THINK RIGHT • BOOK APP • V2.7", bg="white", fg="#7a8aa0", font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        tk.Label(brand, text="THINK RIGHT • BOOK APP • V4.2", bg="white", fg="#7a8aa0", font=("Segoe UI", 8, "bold")).pack(anchor="w")
 
         nav = tk.Frame(top, bg="white")
         nav.pack(side="right", padx=12)
