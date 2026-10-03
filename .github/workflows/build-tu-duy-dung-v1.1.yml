@@ -1,4 +1,4 @@
-name: Build Tu Duy Dung Book App V2.7.2
+name: Build Tu Duy Dung Book App V4.2
 
 on:
   workflow_dispatch:
@@ -32,36 +32,36 @@ jobs:
       - name: Syntax check
         working-directory: tu-duy-dung-bookapp
         run: |
-          python -m py_compile app.py content.py stories.py learning_data.py i18n_en.py i18n_extra.py validate.py
+          python -m py_compile app.py content.py stories.py learning_data.py i18n_en.py i18n_extra.py v42_data.py v42_ui.py validate.py
 
-      - name: Validate all V2.7.2 bilingual data
+      - name: Validate all V4.2 data
         working-directory: tu-duy-dung-bookapp
         run: |
           python validate.py
 
-      - name: GUI bilingual stable-layout regression test
+      - name: V4.2 feature smoke test
         working-directory: tu-duy-dung-bookapp
         shell: powershell
         timeout-minutes: 2
         run: |
-          python -u -c "import app; print('create app'); a=app.App(); print('home ok'); a.geometry('1280x760'); a.language_mode='BI'; print('lesson 1.1'); a.show_lesson('1.1'); assert a.current_view=='lesson'; assert not a._rendering_lesson; print('lesson 6.1'); a.show_lesson('6.1'); print('quiz'); a.show_quiz('1.2'); print('cases'); a.show_cases(); print('tools'); a.show_tools(); print('glossary'); a.show_glossary(); print('progress'); a.show_progress(); print('english lesson'); a.language_mode='EN'; a.show_lesson('8.1'); print('vietnamese lesson'); a.language_mode='VI'; a.show_lesson('10.4'); print('flush geometry'); a.update_idletasks(); a.destroy(); print('V2.7.2 stable bilingual GUI regression test OK')"
+          python -u -c "import app; a=app.App(); print('app'); a.show_lesson('1.1'); print('lesson'); a.show_quiz('1.1'); print('quiz4',len(a.quiz_vi['1.1'])); assert len(a.quiz_vi['1.1'])==4; a.show_review(); print('review'); a.show_case_lab(reset=True); print('case-lab'); a.show_workbench('risk'); print('workbench-risk'); a.show_workbench('decision'); print('workbench-decision'); a.show_notes('1.1'); print('notes'); a.show_tools(); a.show_glossary(); a.show_progress(); print('legacy-features'); a.destroy(); print('V4.2 smoke test OK')"
 
       - name: Build portable EXE
         working-directory: tu-duy-dung-bookapp
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V2.7.2" app.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "TuDuyDung_BookApp_V4.2" app.py
 
       - name: Verify EXE exists
         shell: powershell
         run: |
-          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.2.exe")) { throw "EXE not found" }
-          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.2.exe").Length
+          if (-not (Test-Path "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V4.2.exe")) { throw "EXE not found" }
+          $size=(Get-Item "tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V4.2.exe").Length
           if ($size -lt 1000000) { throw "EXE size looks invalid: $size" }
           Write-Host "EXE size: $size bytes"
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_BookApp_V2.7.2_Windows
-          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V2.7.2.exe
+          name: TuDuyDung_BookApp_V4.2_Windows
+          path: tu-duy-dung-bookapp/dist/TuDuyDung_BookApp_V4.2.exe
           if-no-files-found: error
