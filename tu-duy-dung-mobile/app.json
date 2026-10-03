@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Tư Duy Đúng",
+    "slug": "tu-duy-dung-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["android", "ios"],
+    "android": {
+      "package": "com.dangduythu.tuduydung",
+      "versionCode": 1
+    },
+    "ios": {
+      "bundleIdentifier": "com.dangduythu.tuduydung",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true
+    }
+  }
+}

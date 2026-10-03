@@ -1,0 +1,18 @@
+{
+  "name": "tu-duy-dung-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "export:content": "python scripts/export_content.py",
+    "doctor": "expo-doctor"
+  },
+  "dependencies": {
+    "expo": "~57.0.0",
+    "react": "19.2.3",
+    "react-native": "0.86.0"
+  },
+  "devDependencies": {}
+}
