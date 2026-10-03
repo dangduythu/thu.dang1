@@ -323,7 +323,10 @@ class App(V42Mixin, tk.Tk):
         elif self.current_view == "quiz":
             self.show_quiz(self.current_quiz_lesson)
         elif self.current_view == "cases":
-            self.show_cases(self.current_case_id)
+            if getattr(self,"case_mode","classic")=="lab":
+                self.show_case_lab(self.current_multi_case)
+            else:
+                self.show_cases(self.current_case_id)
         elif self.current_view == "tools":
             self.show_tools(self.current_tool_id)
         elif self.current_view == "glossary":
@@ -784,6 +787,7 @@ class App(V42Mixin, tk.Tk):
         self.show_quiz(lid)
 
     def show_cases(self,case_id=None):
+        self.case_mode="classic"
         if case_id in self.case_by_id:self.current_case_id=case_id
         self._activate_view("cases")
         v=self.views["cases"].inner; self._clear(v)
