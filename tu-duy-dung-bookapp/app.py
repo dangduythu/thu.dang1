@@ -127,6 +127,10 @@ class App(tk.Tk):
         self.read_lessons = set(st.get("read_lessons", []))
         self.quiz_scores = dict(st.get("quiz_scores", {}))
         self.case_results = dict(st.get("case_results", {}))
+        self.notes = dict(st.get("notes", {}))
+        self.workbench_docs = dict(st.get("workbench_docs", {}))
+        self.review_state = dict(st.get("review_state", {}))
+        self.lesson_scroll = dict(st.get("lesson_scroll", {}))
         self.current_lesson = st.get("last_lesson", "1.1")
         self.font_size = int(st.get("font_size", 12))
         self.language_mode = st.get("language_mode", "BI")
@@ -144,7 +148,11 @@ class App(tk.Tk):
         self.current_quiz_lesson = self.current_lesson
         self.current_case_id = CASES[0]["id"] if CASES else None
         self.current_tool_id = TOOLS[0]["id"] if TOOLS else None
+        self.current_multi_case = MULTI_CASES[0]["id"] if MULTI_CASES else None
+        self.current_workbench = WORKBENCH_TEMPLATES[0]["id"] if WORKBENCH_TEMPLATES else None
+        self.current_flash_index = 0
         self.current_view = "home"
+        self.focus_mode = False
         self.block_tree_event = False
         self._rendering_lesson = False
 
@@ -154,6 +162,12 @@ class App(tk.Tk):
         self.glossary_search_var = tk.StringVar()
         self.tool_search_var = tk.StringVar()
         self.language_var = tk.StringVar(value=self.language_mode)
+        self.note_status_var = tk.StringVar()
+        self.flash_answer_visible = False
+
+        for lid in self.lesson_by_id:
+            if lid not in self.review_state:
+                self.review_state[lid] = default_review_state([lid])[lid]
 
         self._configure_styles()
         self._build_shell()
@@ -178,6 +192,10 @@ class App(tk.Tk):
             "read_lessons": sorted(self.read_lessons),
             "quiz_scores": self.quiz_scores,
             "case_results": self.case_results,
+            "notes": self.notes,
+            "workbench_docs": self.workbench_docs,
+            "review_state": self.review_state,
+            "lesson_scroll": self.lesson_scroll,
             "last_lesson": self.current_lesson,
             "font_size": self.font_size,
             "language_mode": self.language_mode,
