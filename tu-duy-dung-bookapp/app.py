@@ -12,6 +12,7 @@ from learning_data import GLOSSARY, TOOLS, CASES, build_quiz_for_lesson
 from i18n_en import UI, EN_CHAPTERS, EN_LESSONS
 from i18n_extra import EN_STORIES, EN_GLOSSARY, EN_TOOLS, EN_CASES
 from v42_data import MULTI_CASES, WORKBENCH_TEMPLATES, default_review_state, next_review, flashcard_for_lesson
+from v42_ui import V42Mixin
 
 APP_NAME = "Tư Duy Đúng / Think Right – Book App"
 VERSION = "4.2"
@@ -114,7 +115,7 @@ class ScrollableFrame(tk.Frame):
         self.canvas.yview_moveto(0)
 
 
-class App(tk.Tk):
+class App(V42Mixin, tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(f"{APP_NAME} V{VERSION}")
@@ -247,10 +248,11 @@ class App(tk.Tk):
             (self._ui("home"), self.show_home),
             (self._ui("read"), self.continue_reading),
             (self._ui("quiz"), self.show_quiz),
-            (self._ui("cases"), self.show_cases),
+            (self._ui("cases"), self.show_case_lab),
             (self._text("Ôn tập","Review").replace("\n"," / "), self.show_review),
             (self._text("Workbench","Workbench"), self.show_workbench),
             (self._ui("tools"), self.show_tools),
+            (self._ui("glossary"), self.show_glossary),
             (self._ui("progress"), self.show_progress)
         ]:
             ttk.Button(nav, text=label, command=cmd, style="Nav.TButton").pack(side="left", padx=2, pady=16)
@@ -328,6 +330,12 @@ class App(tk.Tk):
             self.show_glossary()
         elif self.current_view == "progress":
             self.show_progress()
+        elif self.current_view == "review":
+            self.show_review()
+        elif self.current_view == "workbench":
+            self.show_workbench(self.current_workbench)
+        elif self.current_view == "notes":
+            self.show_notes(self.current_lesson)
 
     def _activate_view(self,name):
         for v in self.views.values():
@@ -552,7 +560,10 @@ class App(tk.Tk):
         actions=tk.Frame(inn,bg="white"); actions.pack(anchor="w",pady=(15,0))
         ttk.Button(actions,text="▶ "+self._ui("continue"),command=self.continue_reading).pack(side="left")
         ttk.Button(actions,text=self._ui("quiz"),command=self.show_quiz).pack(side="left",padx=6)
-        ttk.Button(actions,text=self._ui("cases"),command=self.show_cases).pack(side="left",padx=6)
+        ttk.Button(actions,text=self._ui("cases"),command=self.show_case_lab).pack(side="left",padx=6)
+        ttk.Button(actions,text=self._text("Ôn tập","Review").replace("\n"," / "),command=self.show_review).pack(side="left",padx=6)
+        ttk.Button(actions,text=self._text("Workbench","Workbench"),command=self.show_workbench).pack(side="left",padx=6)
+        ttk.Button(actions,text=self._ui("glossary"),command=self.show_glossary).pack(side="left",padx=6)
 
         grid=tk.Frame(v,bg=BG); grid.pack(fill="both",expand=True)
         for i,ch in enumerate(CHAPTERS,1):
@@ -923,6 +934,9 @@ class App(tk.Tk):
         elif self.current_view=="tools":self.show_tools(self.current_tool_id)
         elif self.current_view=="glossary":self.show_glossary()
         elif self.current_view=="progress":self.show_progress()
+        elif self.current_view=="review":self.show_review()
+        elif self.current_view=="workbench":self.show_workbench(self.current_workbench)
+        elif self.current_view=="notes":self.show_notes(self.current_lesson)
 
     def close_app(self):
         self._save_state()
