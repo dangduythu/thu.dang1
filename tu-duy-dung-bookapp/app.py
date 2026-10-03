@@ -910,11 +910,25 @@ class App(V42Mixin, tk.Tk):
         self._activate_view("progress")
         v=self.views["progress"].inner; self._clear(v)
         self._section_title(v,"Tiến độ học tập","Learning Progress","Theo dõi đọc sách, quiz và case study.","Track reading, quizzes, and case studies.")
-        done=len(self.read_lessons & set(self.lesson_by_id)); qn=len(self.quiz_scores); avg=round(sum(map(int,self.quiz_scores.values()))/qn) if qn else 0; cc=sum(1 for x in self.case_results.values() if x)
-        stats=[("Đọc sách","Reading",f"{done}/{len(self.lessons)}","#dbeafe","#1d4ed8"),("Quiz hoàn thành","Quizzes completed",f"{qn}/{len(self.lessons)}","#ede9fe","#7c3aed"),("Quiz trung bình","Average quiz",f"{avg}%","#fef3c7","#b45309"),("Case đúng","Correct cases",f"{cc}/{len(CASES)}","#dcfce7","#15803d")]
+        done=len(self.read_lessons & set(self.lesson_by_id)); qn=len(self.quiz_scores); avg=round(sum(map(int,self.quiz_scores.values()))/qn) if qn else 0
+        cc=sum(1 for x in self.case_results.values() if (isinstance(x,bool) and x) or (isinstance(x,(int,float)) and x>=70))
+        due=len(self._due_flash_ids()) if hasattr(self,"_due_flash_ids") else 0
+        note_count=len([x for x in self.notes.values() if str(x).strip()])
+        work_count=len([x for x in self.workbench_docs.values() if x])
+        stats=[
+            ("Đọc sách","Reading",f"{done}/{len(self.lessons)}","#dbeafe","#1d4ed8"),
+            ("Quiz hoàn thành","Quizzes completed",f"{qn}/{len(self.lessons)}","#ede9fe","#7c3aed"),
+            ("Quiz trung bình","Average quiz",f"{avg}%","#fef3c7","#b45309"),
+            ("Case đạt","Cases passed",f"{cc}","#dcfce7","#15803d"),
+            ("Ôn hôm nay","Due review",str(due),"#e0f2fe","#0369a1"),
+            ("Ghi chú","Notes",str(note_count),"#fce7f3","#be185d"),
+            ("Worksheets","Worksheets",str(work_count),"#f1f5f9","#475569")
+        ]
         row=tk.Frame(v,bg=BG); row.pack(fill="x",pady=(0,10))
-        for vi,en,val,bg,fg in stats:
-            c=tk.Frame(row,bg=bg,bd=1,relief="solid",highlightbackground=LINE); c.pack(side="left",fill="both",expand=True,padx=4)
+        for idx,(vi,en,val,bg,fg) in enumerate(stats):
+            c=tk.Frame(row,bg=bg,bd=1,relief="solid",highlightbackground=LINE)
+            c.grid(row=idx//4,column=idx%4,sticky="nsew",padx=4,pady=4)
+            row.grid_columnconfigure(idx%4,weight=1)
             tk.Label(c,text=self._text(vi,en).replace("\n"," / ").upper(),bg=bg,fg=fg,font=("Segoe UI",9,"bold")).pack(anchor="w",padx=12,pady=(10,2))
             tk.Label(c,text=val,bg=bg,fg=TEXT,font=("Segoe UI",22,"bold")).pack(anchor="w",padx=12,pady=(0,10))
         for i,ch in enumerate(CHAPTERS,1):
