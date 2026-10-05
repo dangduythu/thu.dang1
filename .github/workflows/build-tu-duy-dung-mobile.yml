@@ -80,21 +80,28 @@ jobs:
         working-directory: tu-duy-dung-mobile
         run: npx expo prebuild --platform android --non-interactive --clean
 
-      - name: Build installable debug APK
+      - name: Build standalone release APK with bundled JavaScript
         working-directory: tu-duy-dung-mobile/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Verify JS bundle is packaged in APK
+        run: |
+          APK="tu-duy-dung-mobile/android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK"
+          unzip -l "$APK" | tee apk-contents.txt
+          grep -E "index.android.bundle|assets/index.android.bundle" apk-contents.txt
 
       - name: Prepare APK
         run: |
-          cp tu-duy-dung-mobile/android/app/build/outputs/apk/debug/app-debug.apk TuDuyDung_Mobile_V1.0.apk
-          test -s TuDuyDung_Mobile_V1.0.apk
-          ls -lh TuDuyDung_Mobile_V1.0.apk
+          cp tu-duy-dung-mobile/android/app/build/outputs/apk/release/app-release.apk TuDuyDung_Mobile_V1.0.1.apk
+          test -s TuDuyDung_Mobile_V1.0.1.apk
+          ls -lh TuDuyDung_Mobile_V1.0.1.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TuDuyDung_Mobile_V1.0_APK
-          path: TuDuyDung_Mobile_V1.0.apk
+          name: TuDuyDung_Mobile_V1.0.1_APK
+          path: TuDuyDung_Mobile_V1.0.1.apk
           if-no-files-found: error
