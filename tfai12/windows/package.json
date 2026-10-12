@@ -34,7 +34,7 @@
       ]
     },
     "portable": {
-      "requestExecutionLevel": "asInvoker"
+      "requestExecutionLevel": "user"
     }
   }
 }
