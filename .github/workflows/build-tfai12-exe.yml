@@ -1,0 +1,41 @@
+name: Build T-FAI 12 Portable Windows EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfai12-windows]
+    paths:
+      - 'tfai12/windows/**'
+      - '.github/workflows/build-tfai12-exe.yml'
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: tfai12/windows
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check source
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'app/index.html')) { throw 'Missing app/index.html; upload application HTML first' }
+          if (-not (Test-Path 'app/du_lieu_mau.csv')) { throw 'Missing app/du_lieu_mau.csv; upload CSV first' }
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build portable Windows EXE
+        run: npm run build:win
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Validate portable EXE
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem dist -Filter '*.exe' | Select-Object -First 1
+          if (-not $exe) { throw 'No EXE created' }
+          if ($exe.Length -lt 1000000) { throw 'EXE is unexpectedly small' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: T-FAI_12_Analysis_V3_8_Windows_Portable
+          path: tfai12/windows/dist/*.exe
+          if-no-files-found: error
