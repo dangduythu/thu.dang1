@@ -1,6 +1,6 @@
 {
   "name": "t-fai-12-analysis",
-  "version": "3.8.0",
+  "version": "4.1.0",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "build": {
     "appId": "local.processengineering.tfai12",
     "productName": "T-FAI 12 Analysis",
-    "artifactName": "T-FAI_12_Analysis_V3.8_${arch}.${ext}",
+    "artifactName": "T-FAI_12_Analysis_V4.1_${arch}.${ext}",
     "directories": {
       "output": "dist"
     },
