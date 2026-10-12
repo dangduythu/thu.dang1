@@ -1,0 +1,40 @@
+{
+  "name": "t-fai-12-analysis",
+  "version": "3.8.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "build:win": "electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "^37.5.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "local.processengineering.tfai12",
+    "productName": "T-FAI 12 Analysis",
+    "artifactName": "T-FAI_12_Analysis_V3.8_${arch}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "app/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "requestExecutionLevel": "asInvoker"
+    }
+  }
+}
