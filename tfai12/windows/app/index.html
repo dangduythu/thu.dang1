@@ -1,0 +1,500 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>T-FAI 12 Analysis | V3.7</title><style>
+:root{font:14px/1.5 'Segoe UI',Arial,sans-serif;color:#eaf1fa;background:#0b1423}*{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;border-radius:8px;background:#2588d8;color:white;padding:10px 15px;font-weight:600}button.secondary{background:#233650;color:#dce9f8;border:1px solid #40536c}button.danger{background:#542d39}.wrap{max-width:1580px;margin:auto;padding:24px}header{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:22px}.brand{font-size:25px;font-weight:750;letter-spacing:-.5px}.brand small{font-size:12px;color:#9bb5d5;font-weight:400;display:block;letter-spacing:normal}.chip{padding:5px 10px;background:#123f40;border-radius:50px;color:#70d6ae;font-size:12px}.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}.tabs button{background:#1a2a42}.tabs button.active{background:#1687d0}.panel{border:1px solid #263c59;background:#132138;border-radius:12px;padding:19px;margin-bottom:18px;box-shadow:0 4px 15px #04091628}.panel h2{margin:0 0 5px;font-size:18px}.muted{color:#9fb2c9;font-size:12.5px}.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.bar>*{flex-shrink:0}input,select,textarea{background:#0b1729;border:1px solid #36506d;color:#e7f1ff;border-radius:7px;padding:9px 11px}textarea{width:100%;min-height:110px;font:12px/1.5 Consolas,monospace}input[type=number]{width:100px}input[type=file]{max-width:310px}.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{background:#132138;border:1px solid #263c59;border-radius:10px;padding:14px}.stat b{display:block;font-size:25px;color:#e9f6ff;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:#9fb3c9}.two{display:grid;grid-template-columns: minmax(320px,1fr) minmax(320px,1fr);gap:16px}.tablebox{overflow:auto;max-height:65vh;border-radius:9px;border:1px solid #2c435e}table{border-collapse:collapse;width:100%;white-space:nowrap;font-size:12px}th,td{border-bottom:1px solid #293c55;padding:8px 10px;text-align:right;font-variant-numeric:tabular-nums}th{position:sticky;top:0;background:#213650;color:#bdd8ed;z-index:2}td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:#182b43;z-index:1}tr:hover td{background:#25405c}td input{padding:4px 5px;width:105px;font-size:12px;text-align:right}td strong{color:#91d1ff}.pass{color:#64dbab}.fail{color:#ff8090}.warn{color:#f8d17a}.grid81{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(9,minmax(0,auto));gap:8px}.pt{min-height:74px;border-radius:10px;border:1px solid #37597a;color:#eef6ff;display:grid;place-content:center;gap:3px;text-align:center;font-size:11px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);transition:transform .08s ease, box-shadow .12s ease}.pt:hover,.pt:focus{transform:translateY(-1px);box-shadow:0 0 0 2px rgba(144,200,255,.35)}.pt span{opacity:.92}.pt strong{font-size:15px}.pt small{font-size:10px;opacity:.9}.boxplot-scroll{overflow-x:auto;overflow-y:hidden;border:1px solid #2c435e;border-radius:9px;background:#0b192d;margin-top:12px}.boxplot-scroll svg{display:block;min-width:100%;height:375px}.heatLegend{display:flex;align-items:center;gap:10px;margin:0 0 12px}.heatLegend .bar{flex:1;height:12px;border-radius:999px;background:linear-gradient(90deg,#123b8a 0%,#1da7ff 25%,#4fd2c2 45%,#e7d35e 70%,#ea6a4e 85%,#b32020 100%);border:1px solid #40617d}.heatLegend .txt{font-size:12px;color:#adbed2;min-width:56px}.notice{padding:11px 14px;border-left:3px solid #f0bb63;background:#45381955;border-radius:5px;margin-bottom:16px}.log{max-height:160px;overflow:auto}.hidden{display:none!important}.rowfile{display:grid;grid-template-columns:32px 1fr 1.3fr 110px 100px;align-items:center;gap:9px;padding:9px;border-bottom:1px solid #2c425f}.rowfile input{width:100%}.buttonright{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.label{font-size:12px;color:#adbed2}.code{font:12px Consolas,monospace}#detail{min-height:85px}.line{height:12px;background:#263c56;border-radius:8px;overflow:hidden}.line>i{display:block;height:100%;background:#43c6a8}.tip{color:#c5d7ee}.status{font-size:13px;margin:10px 0;color:#a5d5ed}#trend{width:100%;height:225px;display:block}.small{font-size:12px}@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.wrap{padding:12px}.pt{min-height:48px;font-size:9px}.pt strong{font-size:11px}}@media print{body{background:white;color:black}.panel,.stat{background:white;color:black}.tabs,.buttonright,button{display:none}td,th{color:black}}
+.laserbar{border:1px solid #2c4964;border-radius:12px;padding:12px 15px;margin:-5px 0 16px;background:#12263e}.heads{display:inline-flex;gap:5px;flex-wrap:wrap;margin:0 12px;vertical-align:middle}.heads button{min-width:34px;padding:5px 9px;background:#283d56}.heads button.active{background:#1597df;box-shadow:0 0 0 2px #a5d8ff}.laserbar small{color:#99b4d2}.dashboardstat{min-width:120px}.rowfile{grid-template-columns:32px minmax(145px,1fr) minmax(170px,1.3fr) 70px 80px 110px}.rowfile select{width:100%;padding:5px}.twoplotnote{font-size:12px;color:#b3d5f0}@media(max-width:650px){.rowfile{display:flex;flex-wrap:wrap}.heads{display:flex;margin:10px 0}} td.delta-ng, tr:hover td.delta-ng{background:#fee2e2!important;color:#b91c1c!important;font-weight:800;border-bottom:2px solid #dc2626}.delta-ng{font-variant-numeric:tabular-nums}</style><style id="theme31">
+:root{color:#193451;background:#f3f7ff}body{background:#f3f7ff;color:#193451}header{background:#fff;border:1px solid #dbe6f4;border-radius:14px;padding:16px 20px;box-shadow:0 4px 16px #15385d0d}.brand{color:#153b70}.brand small,.muted,.label,.laserbar small{color:#647e9b}.panel,.stat{background:#fff;border-color:#d8e5f3;box-shadow:0 4px 15px #12385b0a}.panel h2{color:#173b70}.laserbar{background:#fff;border:1px solid #d9e5f3}.heads button{background:#eaf1fb;color:#24517f}.heads button.active{background:#2466dd;color:white;box-shadow:0 0 0 2px #aec9ff}.tabs button{background:#e8f0fc;color:#254a79}.tabs button.active{background:#2466dd;color:white}.notice{background:#fff6e2;color:#634722;border-color:#efa934}.chip{background:#e3f8ef;color:#18805d}input,select,textarea{background:#fff;color:#173b62;border:1px solid #c8d9ec}button.secondary{background:#e8f0fc;color:#24517c;border-color:#c9daef}button{background:#2466dd}table{color:#213d60}th{background:#e7f0fc;color:#244d7b;border-bottom:1px solid #c9dbf0}td:first-child{background:#f0f5fd;color:#244d7b}th:first-child{background:#e7f0fc}td{border-color:#e3ebf5}tr:hover td{background:#edf4fc}.tablebox{border-color:#d5e2f3}.stat b{color:#163f80}.stat span{color:#6b84a0}.status{color:#317398}.pass,.okresult{color:#078653!important}.fail,.ngresult{color:#da481b!important}.warn{color:#a26300!important}.heatLegend .txt{color:#617c99}.heatLegend .bar{background:linear-gradient(90deg,#123b8a,#1e94dd,#54dbd1,#ead657,#e98035,#bc252a)}.pt{color:#fff}.boxlabel{font-size:12px;color:#46668a;font-weight:700}.limits{display:flex;gap:12px;align-items:end;flex-wrap:wrap;padding:14px;border:1px solid #d8e6f5;border-radius:10px;background:#f8fbff;margin:12px 0}.limits label{display:grid;gap:4px;font-size:12px;color:#496787}.limits input{width:130px}.linechip{color:#2360b0;font-weight:700;background:#e8f1ff;padding:5px 9px;border-radius:20px}.dashboardtab{font-weight:700}
+</style><style>
+:root{--line-blue:#2463e6;--line-green:#159b5e;--line-orange:#ec8626;--line-color:var(--line-blue)}
+#laserHeads{display:flex;flex-wrap:wrap;gap:5px}
+#laserHeads button{background:#eaf1fc;color:#365777;border:1px solid #d5e2f4;box-shadow:none}
+#laserHeads button[data-line="Line 1"]{background:#e8f0ff;color:#2059cf;border-color:#b6cfff}
+#laserHeads button[data-line="Line 2"]{background:#e4f8ed;color:#087a49;border-color:#b1e5ca}
+#laserHeads button[data-line="Line 3"]{background:#fff0df;color:#af5914;border-color:#ffcf9d}
+#laserHeads button.active{background:var(--line-color);border-color:var(--line-color);color:#fff;box-shadow:0 2px 8px #0002}
+.laserbar{border-left:5px solid var(--line-color)!important}
+.linechip{background:color-mix(in srgb,var(--line-color) 14%,white);color:var(--line-color);border-radius:999px;padding:4px 10px}
+.extra7{margin-top:16px;padding:15px;border:1px solid #bbcee9;border-radius:9px;background:#f7faff}
+.offset-table td.bad{color:#c42a30;font-weight:800;background:#ffebed}.offset-table td.ok{color:#078452;font-weight:700}
+.offset-highlight{background:#edf5ff;border:1px solid #c2d8f9;padding:12px;border-radius:9px;margin-bottom:12px}
+.offset-note{background:#fff8e8;border-left:4px solid #f1ad36;padding:12px;border-radius:8px;margin-bottom:12px}
+
+/* V3.7 polished KPI status cards */
+header{position:relative;gap:12px} .lang-switch{display:flex;align-items:center;gap:4px;border:1px solid #cbdcf0;padding:4px;background:#f3f7fc;border-radius:10px;margin-left:auto}
+.lang-switch button{padding:6px 12px;border-radius:7px;font-weight:800;font-size:12px;color:#44617f;background:transparent}
+.lang-switch button.selected{background:#2463e8;color:white;box-shadow:0 3px 9px #2463e82a}
+#dashboard .panel:first-child{background:linear-gradient(150deg,#fff,#f2f8ff);border:1px solid #caddf4;box-shadow:0 10px 28px #3769a21b}
+#dashStats .stat{position:relative;overflow:hidden;min-height:111px;background:#fff;border:1px solid #cbdcf0;box-shadow:0 5px 14px #20569811;transition:transform .15s ease}
+#dashStats .stat:hover{transform:translateY(-2px)}
+#dashStats .stat:before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:#376feb}
+#dashStats .stat.kpi-ok{background:linear-gradient(145deg,#e3fff0,#fafffc);border-color:#79d8a7}
+#dashStats .stat.kpi-ok:before{background:#0bb66b}
+#dashStats .stat.kpi-ng{background:linear-gradient(145deg,#ffebed,#fff8f7);border-color:#ed9198}
+#dashStats .stat.kpi-ng:before{background:#ee344a}
+#dashStats .stat.kpi-ok b{color:#078747!important}#dashStats .stat.kpi-ng b{color:#cc1c31!important}
+#dashStats .stat b{font-size:27px;font-weight:850}#dashStats .stat.kpi-ng b,#dashStats .stat.kpi-ok b{font-size:29px}
+.okresult,.ngresult{display:inline-flex;align-items:center;justify-content:center;min-width:55px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900!important;letter-spacing:.5px;white-space:nowrap}
+.okresult{background:#d3f9e3!important;color:#087845!important;border:1px solid #71db9d}
+.ngresult{background:#ffe0e2!important;color:#bb172e!important;border:1px solid #f19da4}
+#dashboard table td:has(.ngresult){background:#fff0f1!important}
+#dashboard table td:has(.okresult){background:#f2fff7!important}
+#resultRows td.bad,#offsetRows td.bad{color:#c41e37!important;background:#ffe6e8!important;font-weight:800}
+#resultRows td.fail,#resultRows td.ngresult{color:#c41e37!important;background:#ffe6e8!important;font-weight:800}
+#resultRows td.pass{color:#00884e!important;background:#e9fff3!important;font-weight:800}
+.status-legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12px;color:#54718d;margin:12px 0}
+@media(max-width:760px){.lang-switch{order:3;margin-left:0}#dashStats .stat b{font-size:20px}}
+
+.range-config{margin:14px 0}.range-config label{font-size:12px;color:#365780;display:flex;align-items:center;gap:8px}.range-config input{max-width:110px}.rangeSummary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:13px 0}.rangeCard{border:1px solid #d6e4f6;background:#f5f9ff;border-radius:12px;padding:13px;min-height:88px}.rangeCard b{font-size:22px;display:block;color:#183f7d}.rangeCard span{font-size:12px;color:#567092}.rangeCard.ok{background:#e9fbf1;border-color:#a2e5c0}.rangeCard.ok b{color:#087b41}.rangeCard.ng{background:#fff0ee;border-color:#ffb8ad}.rangeCard.ng b{color:#b52219}.rangeBad{background:#ffe0dd!important;color:#a91217!important;font-weight:800}.rangeOK{color:#058148;font-weight:700}.rangeTag{border-radius:7px;padding:4px 8px;font-weight:800;display:inline-block}.rangeTag.ok{background:#d6f8e5;color:#067640}.rangeTag.ng{background:#ffe0dc;color:#b31919}#rangeRows td{font-size:12px}#rangeRows tr:hover td{background:#f0f6ff}@media(max-width:1050px){.rangeSummary{grid-template-columns:repeat(2,minmax(0,1fr))}}</style></head><body><div class="wrap"><header><div class="brand">◈ T-FAI 12 Analysis <small>V3.8 · Process Engineering · Theo dõi 18 đầu Laser · 3 Line · FAI1/FAI2/FAI9/CA</small></div><div class="lang-switch" aria-label="Language / Ngôn ngữ"><button id="langVI" type="button" class="selected" aria-pressed="true">VI</button><button id="langEN" type="button" aria-pressed="false">EN</button></div><span class="chip">● Offline · Không kết nối máy Laser</span></header><div class="laserbar"><b>Đầu Laser</b><span class="linechip" id="lineCaption"></span><div id="laserHeads" class="heads"></div><small id="laserContext">Chọn đầu Laser trước khi nhập PET</small></div>
+<div class="notice">Tọa độ trung bình là <b>Actual trung bình của từng điểm</b> trên các PET được chọn. Nominal mục tiêu do người dùng nhập riêng. ΔX = Mean Actual X − Target X; ΔY tương tự; TP2D = 2 × √(ΔX² + ΔY²). Đây là kết quả phân tích, <b>không tự động là chiều offset máy Laser</b>.</div>
+<nav class="tabs" aria-label="Các bước phân tích"><button data-tab="import" class="active">1 · Nhập dữ liệu PET</button><button data-tab="nominal">2 · Nhập Nominal chuẩn</button><button data-tab="result">3 · Trung bình & Sai lệch</button><button data-tab="map">4 · Bản đồ & Ổn định</button><button data-tab="holes">5 · Nominal 8 lỗ</button><button data-tab="dashboard">6 · Dashboard</button><button data-tab="offset">7 · Laser Offset</button></nav>
+<section id="import" class="page"><div class="panel"><h2>Nhập nhiều PET (FAI9 × 81)</h2><p class="muted">Chọn file CSV, sau đó nhấn “+ Thêm PET” để nhập. Chọn nhiều file CSV xuất từ phần mềm đo như file mẫu (FeatureLabel, OutputItem, Actual, Nominal, Deviation...). Mỗi file = 1 PET. File khác cấu trúc sẽ báo lỗi; các FAI khác tự bỏ qua.</p><div class="bar"><input id="files" type="file" multiple accept=".csv,text/csv"><button id="add">＋ Thêm PET</button><button id="loadExample" class="secondary">Nạp PET mẫu</button><button id="exportBackup" class="secondary">↧ Sao lưu JSON</button><button id="restoreBtn" class="secondary">Khôi phục JSON</button><input id="restoreFile" type="file" accept=".json" class="hidden"></div><p class="status" id="msg">Chưa nhập thêm dữ liệu.</p><div class="label">Thứ tự file = thứ tự theo dõi (có thể nhập ngày giờ đo thực tế sau khi thêm). PET bỏ chọn không được tính vào kết quả.</div><div id="fileRows" class="log"></div><div class="buttonright"><button class="danger" id="deleteSelected">Xóa PET đã bỏ chọn</button><button class="secondary" id="clearAll">Xóa tất cả PET</button></div></div></section>
+<section id="nominal" class="page hidden"><div class="panel"><h2>Thiết lập Target Nominal X/Y — 88 điểm (81 FAI9 + 7 FAI15/FAI16/O4/O5) <span class="linechip" id="nomLineCaption"></span></h2><p class="muted">Chỉ Nominal bạn xác nhận tại đây mới được dùng để so sánh. Không tự ghi đè theo Nominal các file đo mới. Bắt buộc dán đầy đủ 88 dòng từ Excel theo thứ tự FAI9-1 → FAI9-81: <b>X [Tab] Y</b> hoặc <b>FAI9-1 [Tab] X [Tab] Y</b>.</p><div class="bar"><button id="fromFile" class="secondary">Lấy Nominal từ PET đầu (tham khảo)</button><button id="copyNominal" class="secondary">Sao chép Target X/Y</button><button id="saveNominal">Lưu Nominal đã sửa</button></div><p class="label"><b>DÁN TỪ EXCEL:</b> Bôi đen đúng 88 hàng của 2 cột NOMINAL X và Y như hình bạn gửi → Ctrl+C → bấm vào ô bên dưới → Ctrl+V. Phần mềm tự điền đủ 88 điểm. Cũng hỗ trợ bảng 4 cột Point / FeatureLabel / X / Y hoặc 3 cột FAI9-n / X / Y.</p><textarea id="pasteNominal" style="min-height:150px" placeholder="Dán trực tiếp từ Excel tại đây (Ctrl+V):&#10;-40.403&#9;40.404&#10;-40.398&#9;30.300&#10;... đủ 88 hàng"></textarea><p id="pasteFeedback" class="status" role="status">Chờ dán 81 dòng tọa độ X/Y...</p><div class="buttonright"><button id="applyPaste">Kiểm tra &amp; áp dụng 88 điểm</button><button id="clearPaste" class="secondary">Xóa nội dung dán</button></div><div class="tablebox"><table><thead><tr><th>FeatureLabel</th><th>Target X (mm)</th><th>Target Y (mm)</th></tr></thead><tbody id="nominalRows"></tbody></table></div><div class="extra7"><h2>Nominal 7 điểm phụ — FAI15 / FAI16 / O5 / O4</h2><p class="muted">Nhập/dán thêm 7 cặp tọa độ X/Y. Nominal này dùng chung trong Line và chỉ phục vụ Tab Offset, không tham gia trung bình/Heat Map/Box Plot 81 điểm.</p><textarea id="extraNominalPaste" placeholder="7 hàng X [Tab] Y theo thứ tự FAI16-1, FAI15-1, FAI16-2, O5, O4, FAI15-2, FAI16-3"></textarea><div class="buttonright"><button id="applyExtraNominal">Dán & lưu Nominal 7 điểm phụ</button></div><div class="tablebox"><table><thead><tr><th>Điểm</th><th>Target X</th><th>Target Y</th></tr></thead><tbody id="extraNomRows"></tbody></table></div></div></div></section>
+<section id="result" class="page hidden"><div class="bar" style="margin-bottom:12px"><b>Phân tích PET</b><select id="analysisMode"><option value="all">Tất cả PET chưa xóa</option><option value="latest">PET mới nhất</option></select></div><div class="stats" id="stats"></div><div class="panel"><h2>Trung bình 81 tọa độ từ các PET đã nhập</h2><p class="muted">ΔX = Mean Actual X − Target X; ΔY = Mean Actual Y − Target Y. Nếu |ΔX| hoặc |ΔY| vượt giới hạn ± đã nhập, ô sai lệch được tô đỏ. Các phép tính giữ độ chính xác gốc.</p><div class="buttonright"><button id="copyXY">Sao chép 81 dòng X/Y</button><button id="copyFull" class="secondary">Sao chép bảng đầy đủ</button><button id="csvXY" class="secondary">↧ CSV trung bình X/Y</button><button id="csvFull" class="secondary">↧ CSV phân tích đầy đủ</button></div><div class="bar"><label class="label">Dung sai TP2D (mm) <input type="number" id="spec" value="0.05" min="0.0001" step="0.001"></label><label class="label">Ngưỡng dao động σ X hoặc Y (mm) <input type="number" id="sigmaSpec" value="0.005" min="0.0001" step="0.001"></label><label class="label">Giới hạn ±ΔX (mm) <input type="number" id="deltaXSpec" value="0.010" min="0" step="0.001"></label><label class="label">Giới hạn ±ΔY (mm) <input type="number" id="deltaYSpec" value="0.010" min="0" step="0.001"></label><button id="recalc" class="secondary">Cập nhật</button></div><p class="status" id="resultMsg"></p><div class="tablebox"><table><thead><tr><th>Điểm</th><th>Mean Actual X</th><th>Mean Actual Y</th><th>Target X</th><th>Target Y</th><th>ΔX</th><th>ΔY</th><th>TP2D trung bình tọa độ</th><th>σX</th><th>σY</th><th>Max TP2D từng PET</th><th>Đánh giá</th></tr></thead><tbody id="resultRows"></tbody></table></div></div></section>
+<section id="map" class="page hidden"><div class="bar" style="margin-bottom:12px"><b>Phân tích PET</b><select id="mapMode"><option value="all">Tất cả PET chưa xóa</option><option value="latest">PET mới nhất</option></select></div><div class="bar" style="margin:0 0 12px"><b>Heat Map theo trục</b><select id="heatAxis"><option value="X">Deviation X (PET − Nominal)</option><option value="Y">Deviation Y (PET − Nominal)</option></select><span class="muted">Min = xanh đậm · Max = đỏ, tự động theo dữ liệu đang hiển thị</span></div><div class="two"><div class="panel"><h2>Heat map sai lệch 81 điểm</h2><p class="muted">Nhấn một điểm để xem chi tiết. Màu thể hiện Deviation X hoặc Y = Actual PET − Nominal (giá trị có dấu). Min là xanh đậm, Max là đỏ; không áp giới hạn cố định.</p><div class="heatLegend"><span class="txt">Thấp</span><div class="bar"></div><span class="txt" id="heatMaxLabel">Cao</span></div><div id="grid" class="grid81"></div></div><div class="panel"><h2 id="pointTitle">Chi tiết điểm</h2><div id="detail" class="muted">Hãy nhập PET và Nominal.</div><h2>Xu hướng ΔX / ΔY theo thứ tự PET</h2><svg id="trend" viewBox="0 0 650 225" role="img" aria-label="Xu hướng sai lệch X và Y"></svg><div class="label"><span style="color:#43bff7">━━ ΔX</span> &nbsp; <span style="color:#f1c06b">━━ ΔY</span></div></div></div><div class="panel"><h2>Box Plot Deviation X — 81 vị trí</h2><p class="muted">Mỗi hộp thể hiện Q1–Q3, vạch giữa là Median, râu biểu diễn dữ liệu trong 1,5×IQR; dấu tròn là điểm ngoại lai. Đường ngang đứt nét: Nominal (Deviation = 0,000 mm). Dùng thanh cuộn ngang để xem 81 điểm.</p><div class="boxplot-scroll"><svg id="boxplotX" role="img" aria-label="Box plot của sai lệch trục X tại 81 điểm"></svg></div></div><div class="panel"><h2>Box Plot Deviation Y — 81 vị trí</h2><p class="muted">Thống kê riêng theo trục Y, cùng mốc chuẩn Nominal = 0,000 mm. Chỉ PET được chọn mới tham gia phân tích.</p><div class="boxplot-scroll"><svg id="boxplotY" role="img" aria-label="Box plot của sai lệch trục Y tại 81 điểm"></svg></div></div><div class="panel" id="rangeAnalysis"><h2>Phân tích toàn bộ dải PET so với Nominal — 81 vị trí</h2>
+<p class="muted">Phân tích toàn bộ PET chưa xóa của đầu Laser đang chọn (không phụ thuộc chọn PET mới nhất tại Heat Map). Δ = Actual − Nominal. Mean OK không có nghĩa mọi PET đều OK.</p>
+<div class="bar range-config"><label>Giới hạn |ΔX| ≤ (mm) <input id="rangeLimitX" type="number" min="0.000001" step="0.001"></label><label>Giới hạn |ΔY| ≤ (mm) <input id="rangeLimitY" type="number" min="0.000001" step="0.001"></label><button type="button" id="applyRangeLimits">Áp dụng ngưỡng ±X/Y</button><button type="button" class="secondary" id="copyRangeTable">Sao chép 81 điểm vào Excel</button></div>
+<div id="rangeSummary" class="rangeSummary"></div>
+<p class="muted" id="rangeMsg"></p>
+<div class="tablebox"><table><thead><tr><th>Vị trí</th><th>Mean X</th><th>Mean Y</th><th>Nominal X</th><th>Nominal Y</th><th>Mean ΔX</th><th>Mean ΔY</th><th>Min ΔX</th><th>Max ΔX</th><th>Min ΔY</th><th>Max ΔY</th><th>σX</th><th>σY</th><th>Mean</th><th>Dải PET</th></tr></thead><tbody id="rangeRows"></tbody></table></div>
+<p class="muted">Tiêu chí Mean OK: |Mean ΔX| ≤ giới hạn X và |Mean ΔY| ≤ giới hạn Y. Dải PET OK: mọi phép đo của mọi PET tại điểm đó đều nằm trong cả hai giới hạn. Đánh giá từ số liệu gốc, chỉ làm tròn 3 chữ số khi hiển thị.</p></div><div class="panel"><h2>Vị trí dao động nhiều nhất (σX hoặc σY)</h2><div class="tablebox"><table><thead><tr><th>Điểm</th><th>σX</th><th>σY</th><th>Mean TP2D</th><th>TP2D max/PET</th></tr></thead><tbody id="riskRows"></tbody></table></div><p class="muted">σ là độ lệch chuẩn mẫu trên các PET đã chọn (cần ≥2 PET). Chỉ với trung bình đẹp chưa thể khẳng định quá trình ổn định.</p></div></section>
+<section id="holes" class="page hidden"><div class="panel"><h2>Nominal FAI2 · 8 lỗ <span class="linechip" id="holeLineCaption"></span></h2><p class="muted">Dán 8 hàng X và Y (FAI2-1 đến FAI2-8); hoặc 3 cột FAI2-n, X, Y. Target là tọa độ lỗ trong hệ đo FAI2, KHÔNG phải Nominal FAI9.</p><textarea id="holePaste" placeholder="1.812	1.812
+0	2.5625
+... đủ 8 lỗ"></textarea><div class="buttonright"><button id="applyHoles">Áp dụng 8 Nominal</button><button class="secondary" id="fromHoleFile">Lấy Nominal FAI2 từ PET đầu</button></div><div class="tablebox"><table><thead><tr><th>Lỗ</th><th>Nominal X (mm)</th><th>Nominal Y (mm)</th></tr></thead><tbody id="holeNomRows"></tbody></table></div></div></section>
+<section id="dashboard" class="page hidden"><div class="panel"><h2>Dashboard tổng hợp theo đầu Laser</h2><div class="limits"><label>Ngưỡng CA tối đa (°) — đánh giá |CA|<input id="limCA" type="number" step="any" min="0" value="0.1"></label><label>Ngưỡng FAI1 tối đa (mm) — đường kính<input id="limF1" type="number" step="any" min="0" value="2"></label><label>FAI2 ± (mm) — từng ΔX và ΔY<input id="limF2" type="number" step="any" min="0" value="0.05"></label><button id="saveLimits">Lưu ngưỡng kiểm soát</button><span class="muted">OK khi nhỏ hơn ngưỡng; bằng hoặc lớn hơn ngưỡng là NG.</span></div><div class="bar"><label>Phạm vi <select id="dashMode"><option value="all">Toàn bộ PET chưa xóa</option><option value="latest">PET mới nhất</option></select></label><span class="muted">CA dùng đơn vị góc đo gốc (độ); FAI1/FAI2 dùng mm.</span></div><div id="dashStats" class="stats" style="margin-top:16px"></div></div><div class="two"><div class="panel"><h2>FAI1 · Đường kính trung bình của 8 lỗ</h2><div id="fai1table" class="tablebox"></div></div><div class="panel"><h2>FAI2 · Trung bình vị trí của 8 lỗ</h2><div id="fai2table" class="tablebox"></div></div></div><div class="panel"><h2>CA · Góc xoay của 81 vị trí</h2><div id="caDetails" class="tablebox"></div></div></section>
+<section id="offset" class="page hidden">
+ <div class="panel"><h2>7 · Laser Offset — PET mới nhất của đầu Laser đang chọn <span id="offsetLine" class="linechip"></span></h2>
+ <div class="offset-note"><b>Nguyên tắc:</b> Offset X = Nominal X − Actual X và Offset Y = Nominal Y − Actual Y. Các giá trị dưới đây là đề xuất toán học, <b>không tự động ghi vào máy Laser</b>. Cần xác nhận chiều tọa độ, đơn vị, hệ số đáp ứng và kiểm chứng bằng PET thử trước khi áp dụng sản xuất.</div>
+ <div class="offset-highlight" id="offsetStatus">Đang kiểm tra PET mới nhất…</div>
+ <div class="buttonright"><button id="copyOffset">Sao chép Offset 81 điểm (X/Y)</button><button id="copyOffsetAll" class="secondary">Sao chép đầy đủ 88 điểm</button><button id="csvOffset" class="secondary">↧ Xuất CSV Offset</button></div>
+ <div class="tablebox"><table class="offset-table"><thead><tr><th>Điểm</th><th>Nominal X</th><th>Nominal Y</th><th>Actual X</th><th>Actual Y</th><th>Offset X</th><th>Offset Y</th></tr></thead><tbody id="offsetRows"></tbody></table></div>
+ <div class="extra7"><h2>Điểm phụ 82–88: FAI15 / FAI16 / O5 / O4 (O5 và O4 là điểm gốc, mặc định X=0 và Y=0)</h2>
+ <p class="muted">Nếu PET nhập chưa có Actual cho 7 điểm phụ, dán trực tiếp 7 cặp X/Y thực tế từ Excel. Phần mềm giữ các giá trị này riêng theo từng PET/đầu Laser.</p>
+ <textarea id="extraActualPaste" placeholder="Actual X [Tab] Actual Y — 7 hàng đúng thứ tự 82–88"></textarea>
+ <div class="buttonright"><button id="applyExtraActual">Áp dụng Actual của 7 điểm phụ cho PET mới nhất</button></div>
+ </div></div></section>
+<p class="muted">V3.8 | Dữ liệu được lưu trên trình duyệt của máy đang dùng. Nên sao lưu JSON. Khi thay đổi model/recipe cần lưu bộ dữ liệu riêng và xác nhận thứ tự 81 điểm.</p></div><script>
+/* PET Laser 81 | Measurement and correction engine | Standalone, no dependencies */
+(function(root, factory) {
+  const api = factory();
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.PETEngine = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function() {
+  'use strict';
+  const COUNT = 81;
+  const FIXED_SPEC = 0.050;
+  const round = (v,n=6) => Number(Number(v).toFixed(n));
+  const avg = v => v.length ? v.reduce((a,b)=>a+b,0)/v.length : 0;
+  const sorted = v => v.slice().sort((a,b)=>a-b);
+  const median = v => {if (!v.length) return 0;let a=sorted(v);let k=a.length>>1;return a.length%2?a[k]:(a[k-1]+a[k])/2;};
+  const std = v => v.length>1?Math.sqrt(v.reduce((s,x)=>s+(x-avg(v))**2,0)/(v.length-1)):0;
+  const quantile = (v,q) => {if(!v.length)return 0;let a=sorted(v),p=(a.length-1)*q,l=Math.floor(p),r=Math.ceil(p);return a[l]+(a[r]-a[l])*(p-l);};
+  const clamp = (n,min,max) => Math.min(max,Math.max(min,n));
+  const tp = (dx,dy) => 2*Math.hypot(dx,dy);
+  function robustMean(v) {
+    if (!v.length) return 0;
+    if(v.length < 4) return median(v);
+    let loc=median(v), mad=median(v.map(x=>Math.abs(x-loc)));
+    let scale=Math.max(1.4826*mad,0.00025), limit=2.5*scale;
+    for(let it=0;it<5;it++)loc=avg(v.map(x=>loc+clamp(x-loc,-limit,limit)));
+    return loc;
+  }
+  function parseCsv(text) {
+    text=text.replace(/^\uFEFF/,'');
+    const head=text.split(/\r?\n/,1)[0]||'';
+    const delimiter=(head.match(/;/g)||[]).length > (head.match(/,/g)||[]).length?';':',';
+    let rows=[],cell='',row=[],quoted=false;
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      if(c==='"') {if(quoted&&text[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}
+      else if(c===delimiter&&!quoted){row.push(cell);cell='';}
+      else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(s=>s.trim()!=='')) rows.push(row);row=[];cell='';}
+      else cell+=c;
+    }
+    if(quoted)throw Error('CSV có dấu nháy kép chưa được đóng.');
+    row.push(cell);if(row.some(s=>s.trim()!==''))rows.push(row);
+    if(!rows.length)throw Error('File CSV trống.');
+    const names=rows.shift().map(x=>x.trim().replace(/^\uFEFF/,''));
+    const required=['FeatureLabel','OutputItem','Actual','Nominal','Deviation'];
+    for(const n of required)if(!names.includes(n))throw Error('Thiếu cột bắt buộc: '+n+'. Hãy xuất CSV theo đúng định dạng FAI.');
+    return rows.map((r,i)=>Object.fromEntries(names.map((n,j)=>[n,(r[j]||'').trim()])))
+  }
+  function csvToPoints(text) {
+    const rows=parseCsv(text), pointMap=new Map(), duplicates=[];
+    for(const r of rows){
+      const match=/^FAI9-(\d+)$/i.exec(r.FeatureLabel||'');
+      if(!match)continue;
+      const index=+match[1];
+      if(index<1||index>COUNT) continue; // 82–88 handled separately in offset module
+      const item=(r.OutputItem||'').trim();
+      if(!['Coord_X','Coord_Y','TP2D'].includes(item))continue;
+      if(!pointMap.has(index))pointMap.set(index,{});
+      const part=pointMap.get(index);
+      if(part[item])duplicates.push(index+' '+item);
+      part[item]=r;
+    }
+    if(duplicates.length)throw Error('Dòng FAI9 bị lặp: '+duplicates.slice(0,5).join(', '));
+    const missing=[];
+    const points=[];
+    for(let i=1;i<=COUNT;i++){
+      const p=pointMap.get(i);
+      if(!p||!p.Coord_X||!p.Coord_Y){missing.push(i);continue;}
+      function value(row,col){let x=Number(row[col]);if(row[col]===''||!Number.isFinite(x))throw Error('Giá trị không hợp lệ: FAI9-'+i+' / '+row.OutputItem+' / '+col);return x;}
+      let nx=value(p.Coord_X,'Nominal'),ny=value(p.Coord_Y,'Nominal');
+      let x=value(p.Coord_X,'Actual'),y=value(p.Coord_Y,'Actual');
+      let dx=x-nx,dy=y-ny,calculated=tp(dx,dy);
+      const declaredDx=p.Coord_X.Deviation===''?NaN:Number(p.Coord_X.Deviation);
+      const declaredDy=p.Coord_Y.Deviation===''?NaN:Number(p.Coord_Y.Deviation);
+      if(Number.isFinite(declaredDx)&&Math.abs(declaredDx-dx)>0.00002)throw Error('Sai số X không nhất quán tại FAI9-'+i);
+      if(Number.isFinite(declaredDy)&&Math.abs(declaredDy-dy)>0.00002)throw Error('Sai số Y không nhất quán tại FAI9-'+i);
+      if(p.TP2D && p.TP2D.Deviation!==''){
+        let declaredTp=Number(p.TP2D.Deviation);
+        if(!Number.isFinite(declaredTp)||Math.abs(declaredTp-calculated)>0.0005)throw Error('TP2D không khớp tọa độ X/Y tại FAI9-'+i);
+      }
+      points.push({i,nx,ny,x,y,dx,dy,tp:calculated});
+    }
+    if(missing.length)throw Error('FAI9 không đủ 81 vị trí. Thiếu: '+missing.join(', '));
+    return points;
+  }
+  function validateNominal(points,ref,tol=0.0005){
+    for(let j=0;j<COUNT;j++)if(Math.abs(points[j].nx-ref[j].nx)>tol||Math.abs(points[j].ny-ref[j].ny)>tol)
+      throw Error('Nominal khác mẫu hiện hành tại FAI9-'+(j+1)+'. Có thể khác revision/recipe; KHÔNG gộp dữ liệu.');
+  }
+  const metrics = points => {
+    const vals=points.map(p=>p.tp);
+    return {mean:avg(vals),max:Math.max(...vals),p95:quantile(vals,.95),ng:vals.filter(t=>t>FIXED_SPEC+1e-8).length};
+  };
+  const signature = points => points.map(p=>p.dx.toFixed(6)+','+p.dy.toFixed(6)).join('|');
+  const chronological = runs => runs.filter(r=>r.include!==false).slice().sort((a,b)=>new Date(a.ts)-new Date(b.ts)||a.id.localeCompare(b.id));
+  function selectRuns(runs,settings) {
+    let list=chronological(runs);
+    if(settings.machine&&settings.machine!=='ALL')list=list.filter(r=>r.machine===settings.machine);
+    return list.slice(-Math.max(1,Number(settings.window)||20));
+  }
+  function fitCorrection(runs,config) {
+    if(!runs.length)return null;
+    const count=runs.length,ref=runs[0].points;
+    const useRobust=config.method!=='mean';
+    const pointMeans=Array.from({length:COUNT},(_,j)=>{
+      const dx=runs.map(r=>r.points[j].dx),dy=runs.map(r=>r.points[j].dy);
+      return {i:j+1,nx:ref[j].nx,ny:ref[j].ny,mx:useRobust?robustMean(dx):avg(dx),my:useRobust?robustMean(dy):avg(dy),sdx:std(dx),sdy:std(dy),dx,dy};
+    });
+    let biases=[];
+    const mode=config.mode||'point';
+    if(mode==='global'){
+      const x=avg(pointMeans.map(p=>p.mx)),y=avg(pointMeans.map(p=>p.my));
+      biases=pointMeans.map(_=>({bx:x,by:y}));
+    }else if(mode==='rigid'){
+      const cx=avg(pointMeans.map(p=>p.nx)),cy=avg(pointMeans.map(p=>p.ny));
+      const mx=avg(pointMeans.map(p=>p.mx)),my=avg(pointMeans.map(p=>p.my));
+      let num=0,den=0;
+      for(const p of pointMeans){let rx=p.nx-cx,ry=p.ny-cy;num+=rx*(p.my-my)-ry*(p.mx-mx);den+=rx*rx+ry*ry;}
+      let theta=den?num/den:0;
+      biases=pointMeans.map(p=>({bx:mx-theta*(p.ny-cy),by:my+theta*(p.nx-cx)}));
+    }else biases=pointMeans.map(p=>({bx:p.mx,by:p.my}));
+    let rawShift=biases.map(p=>({x:-p.bx,y:-p.by}));
+    const maxStep=Math.max(0,Number(config.maxStep)||0);
+    // Limit global/rigid by a common factor so the transform remains physically meaningful.
+    let globalFactor=1;
+    if(mode!=='point'&&maxStep>0){const mm=Math.max(...rawShift.map(p=>Math.hypot(p.x,p.y)));globalFactor=Math.min(1,maxStep/(mm||1));}
+    const result=pointMeans.map((p,j)=>{
+      const want=rawShift[j];
+      const factor=mode==='point'?(maxStep>0?Math.min(1,maxStep/(Math.hypot(want.x,want.y)||1)):1):globalFactor;
+      const cx=want.x*factor,cy=want.y*factor;
+      const rawtp=p.dx.map((dx,k)=>tp(dx,p.dy[k]));
+      const adjusted=p.dx.map((dx,k)=>tp(dx+cx,p.dy[k]+cy));
+      let drift=false,spc=false;
+      if(count>=10){
+        const n=Math.max(3,Math.floor(count/3)),firstX=avg(p.dx.slice(0,n)),lastX=avg(p.dx.slice(-n)),firstY=avg(p.dy.slice(0,n)),lastY=avg(p.dy.slice(-n));
+        const threshold=Math.max(0.005,2*Math.hypot(p.sdx,p.sdy)/Math.sqrt(n));
+        drift=Math.hypot(lastX-firstX,lastY-firstY)>threshold;
+        const ex=ewmaAlert(p.dx),ey=ewmaAlert(p.dy);
+        spc=ex||ey;
+      }
+      const scatter=Math.hypot(p.sdx,p.sdy);
+      let status=count<Number(config.minRuns||10)?'INSUFFICIENT':
+        Math.max(...rawtp)>Number(config.spec||FIXED_SPEC)+1e-8?'NG':
+        drift||spc||scatter>Number(config.sdThreshold||.005)||quantile(adjusted,.95)>Number(config.spec||FIXED_SPEC)*.8?'WATCH':'STABLE';
+      return {...p,bx:biases[j].bx,by:biases[j].by,cx,cy,newNx:p.nx+cx,newNy:p.ny+cy,rawMean:avg(rawtp),rawMax:Math.max(...rawtp),rawP95:quantile(rawtp,.95),afterMean:avg(adjusted),afterMax:Math.max(...adjusted),afterP95:quantile(adjusted,.95),scatter,drift,spc,status,adjusted};
+    });
+    const spec=Number(config.spec||FIXED_SPEC);
+    const summary={
+      n:count,meanRaw:avg(result.map(p=>p.rawMean)),meanAfter:avg(result.map(p=>p.afterMean)),
+      worstRaw:Math.max(...result.map(p=>p.rawMax)),worstAfter:Math.max(...result.map(p=>p.afterMax)),
+      stable:result.filter(p=>p.status==='STABLE').length,watch:result.filter(p=>p.status==='WATCH').length,
+      ng:result.filter(p=>p.status==='NG').length,insufficient:result.filter(p=>p.status==='INSUFFICIENT').length,
+      beforeViolations:result.reduce((s,p)=>s+p.dx.filter((d,k)=>tp(d,p.dy[k])>spec).length,0),
+      afterViolations:result.reduce((s,p)=>s+p.adjusted.filter(t=>t>spec).length,0)
+    };
+    return {points:result,summary,runs,config};
+  }
+  function ewmaAlert(values){
+    if(values.length<10)return false;
+    // Baseline first 60%, assess final point EWMA against the historical noise floor.
+    const m=Math.max(6,Math.floor(values.length*.6)),reference=values.slice(0,m);
+    const mu=avg(reference),s=std(reference);
+    if(s<0.0001) return Math.abs(avg(values.slice(-3))-mu) > .005;
+    let z=mu,lambda=.25;
+    for(const v of values)z=lambda*v+(1-lambda)*z;
+    return Math.abs(z-mu)>Math.max(.005,3*s*Math.sqrt(lambda/(2-lambda)));
+  }
+  function holdoutValidation(runs,settings) {
+    if(runs.length<10)return null;
+    const cut=Math.max(6,Math.floor(runs.length*.75)),train=runs.slice(0,cut),test=runs.slice(cut);
+    const fit=fitCorrection(train,settings);
+    let pre=[],post=[];
+    for(const r of test)for(let j=0;j<COUNT;j++){
+      const p=r.points[j],offset=fit.points[j];pre.push(p.tp);post.push(tp(p.dx+offset.cx,p.dy+offset.cy));
+    }
+    return {train:train.length,test:test.length,preMean:avg(pre),postMean:avg(post),preP95:quantile(pre,.95),postP95:quantile(post,.95),preMax:Math.max(...pre),postMax:Math.max(...post),preNg:pre.filter(t=>t>settings.spec).length,postNg:post.filter(t=>t>settings.spec).length};
+  }
+  function readiness(model,validation,settings,runs){
+    if(!model)return {level:'BLOCK',reasons:['Chưa có dữ liệu PET.']};
+    const reasons=[];
+    if(model.summary.n<Number(settings.minRuns||10))reasons.push('Ít hơn '+settings.minRuns+' PET trong cửa sổ phân tích.');
+    if(runs.length && (!settings.machine || settings.machine==='ALL') && new Set(runs.map(r=>r.machine)).size>1)reasons.push('Đang gộp nhiều máy Laser: cần lọc theo máy.');
+    if(model.summary.ng>0)reasons.push('Có vị trí NG trong cửa sổ gần đây: cần phân tích nguyên nhân.');
+    if(model.points.some(p=>p.drift||p.spc))reasons.push('Phát hiện dịch chuyển trung bình hoặc tín hiệu EWMA: chưa đủ ổn định.');
+    if(model.points.some(p=>p.scatter>settings.sdThreshold))reasons.push('Độ phân tán X/Y tại một số vị trí vượt giới hạn cảnh báo.');
+    if(model.summary.worstAfter>settings.spec)reasons.push('Mô phỏng sau offset vẫn có điểm vượt TP2D SPEC.');
+    if(validation && validation.postP95>validation.preP95+0.0001)reasons.push('Kiểm chứng trên nhóm PET giữ lại không cải thiện P95.');
+    if(!validation)reasons.push('Chưa đủ mẫu để đánh giá trên PET giữ lại (holdout).');
+    return {level:reasons.length?'BLOCK':'REVIEW',reasons:reasons.length?reasons:['Các kiểm tra thống kê đạt. Cần xác nhận chiều bù, năng lực máy và chạy thử trước khi phê duyệt.']};
+  }
+  function csvExport(rows,keys){
+    function q(v){let s=v==null?'':String(v);return /[",\r\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+    return '\uFEFF'+[keys.join(','),...rows.map(row=>keys.map(k=>q(row[k])).join(','))].join('\r\n');
+  }
+  return {COUNT,FIXED_SPEC,avg,median,std,quantile,tp,round,parseCsv,csvToPoints,validateNominal,metrics,signature,chronological,selectRuns,fitCorrection,holdoutValidation,readiness,csvExport};
+});
+
+</script>
+<script>
+function extraMeasurements(csv){const rr=window.PETEngine.parseCsv(csv),dia=Array.from({length:8},()=>[]),pos=Array.from({length:8},()=>[]),ang=[];const by=new Map();for(const r of rr){const label=r.FeatureLabel||'',item=r.OutputItem||'',v=Number(r.Actual);if(item==='CA'&&/^Angle\[([1-9]),([1-9])\]$/i.test(label)&&r.Actual!==''&&Number.isFinite(v))ang.push(v);let m=/^FAI1-([1-8])\[([1-9]),([1-9])\]$/i.exec(label);if(m&&item==='Diameter'&&r.Actual!==''&&Number.isFinite(v)){dia[+m[1]-1].push(v);continue}m=/^FAI2-([1-8])\[([1-9]),([1-9])\]$/i.exec(label);if(m&&(item==='Coord_X'||item==='Coord_Y')){const key=label;if(!by.has(key))by.set(key,{});by.get(key)[item]=v}}for(const [key,v] of by){const h=+(/^FAI2-([1-8])/.exec(key)||[])[1];if(h&&Number.isFinite(v.Coord_X)&&Number.isFinite(v.Coord_Y))pos[h-1].push({x:v.Coord_X,y:v.Coord_Y})}if(ang.length!==81||dia.some(a=>a.length!==81)||pos.some(a=>a.length!==81))throw Error('Dữ liệu CA/FAI1/FAI2 chưa đủ 81 vị trí × 8 lỗ. CA='+ang.length+'; FAI1='+dia.map(x=>x.length)+'; FAI2='+pos.map(x=>x.length));const holeNominal=Array.from({length:8},(_,j)=>{const x=rr.find(r=>r.FeatureLabel===`FAI2-${j+1}[1,1]`&&r.OutputItem==='Coord_X');const y=rr.find(r=>r.FeatureLabel===`FAI2-${j+1}[1,1]`&&r.OutputItem==='Coord_Y');return{x:Number(x?.Nominal),y:Number(y?.Nominal)}});return{angles:ang,diameters:dia,holes:pos,holeNominal}}
+(()=>{'use strict';const $=id=>document.getElementById(id),E=window.PETEngine,K='PET81_POSITION_V2';let db={runs:[],nominal:null,spec:.05,sigma:.005,deltaXSpec:.010,deltaYSpec:.010,holeNominal:null},selected=1,currentLaser="1",viewMode="all";try{const d=JSON.parse(localStorage.getItem(K));if(d&&Array.isArray(d.runs))db={...db,...d}}catch{}const lineOf=h=>"123456".includes(h)?"Line 1":"789ABC".includes(h)?"Line 2":"Line 3";
+const legacyNom=db.nominal,legacyHole=db.holeNominal;
+if(!db.lineExtraNominals)db.lineExtraNominals={};if(!db.lineNominals)db.lineNominals={};if(!db.lineHoleNominals)db.lineHoleNominals={};
+if(legacyNom&&!db.lineNominals['Line 1'])db.lineNominals['Line 1']=legacyNom;
+if(legacyHole&&!db.lineHoleNominals['Line 1'])db.lineHoleNominals['Line 1']=legacyHole;
+function attachLineNominals(){
+ Object.defineProperty(db,'nominal',{configurable:true,enumerable:false,get(){return db.lineNominals[lineOf(currentLaser)]||null},set(v){db.lineNominals[lineOf(currentLaser)]=v}});
+ Object.defineProperty(db,'holeNominal',{configurable:true,enumerable:false,get(){return db.lineHoleNominals[lineOf(currentLaser)]||null},set(v){db.lineHoleNominals[lineOf(currentLaser)]=v}})
+}
+attachLineNominals();
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch(e){alert('Không lưu được dữ liệu trình duyệt. Hãy sao lưu JSON: '+e.message)}};const fmt=(n,k=3)=>Number.isFinite(n)?n.toFixed(k):'—';const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;const sd=a=>a.length>1?Math.sqrt(a.reduce((s,v)=>s+(v-mean(a))**2,0)/(a.length-1)):NaN;const allLaser=()=>db.runs.filter(r=>(r.laser||"1")===currentLaser);const active=()=>{let a=allLaser();return viewMode==="latest"?a.slice(-1):a};const spec=()=>Number($('spec').value),sigma=()=>Number($('sigmaSpec').value);const deltaXLimit=()=>Number($('deltaXSpec').value);const deltaYLimit=()=>Number($('deltaYSpec').value);const deltaBadX=p=>validNom()&&Number.isFinite(p.dx)&&Math.abs(p.dx)>deltaXLimit();const deltaBadY=p=>validNom()&&Number.isFinite(p.dy)&&Math.abs(p.dy)>deltaYLimit();const validNom=()=>Array.isArray(db.nominal)&&db.nominal.length===81&&db.nominal.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));const fileKey=p=>p.map(x=>fmt(x.x)+':'+fmt(x.y)).join('|');function rows(){const r=active();if(!r.length)return[];return Array.from({length:81},(_,j)=>{const xs=r.map(a=>a.points[j].x),ys=r.map(a=>a.points[j].y),x=mean(xs),y=mean(ys),tx=validNom()?db.nominal[j].x:NaN,ty=validNom()?db.nominal[j].y:NaN,dx=x-tx,dy=y-ty,tp=2*Math.hypot(dx,dy),sx=sd(xs),sy=sd(ys),tps=r.map(a=>2*Math.hypot(a.points[j].x-tx,a.points[j].y-ty));return {i:j+1,x,y,tx,ty,dx,dy,tp,sx,sy,max:Math.max(...tps),n:r.length}})}function stateText(p){if(!validNom())return 'Chưa có Target';if(deltaBadX(p)||deltaBadY(p))return 'NG ΔX/ΔY';if(p.tp>spec())return 'NG trung bình';if(p.n>1&&(p.sx>sigma()||p.sy>sigma()))return 'Dao động cao';if(p.n<2)return '1 PET – chưa đánh giá σ';return 'Trong ngưỡng'}function tab(t){document.querySelectorAll('.page').forEach(e=>e.classList.toggle('hidden',e.id!==t));document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));if(t==='result'){viewMode=$('analysisMode').value;renderResult()}if(t==='map'){viewMode=$('mapMode').value;renderMap();renderRange()}if(t==='nominal')renderNominal();if(t==='holes')renderHoleNominal();if(t==='dashboard')renderDashboard();if(t==='offset')renderOffset()};document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));function renderFiles(){$('fileRows').innerHTML=db.runs.length?db.runs.map((r,i)=>`<div class="rowfile"><input type="checkbox" data-on="${i}" ${r.on?'checked':''}><b>${esc(r.name)}</b><input aria-label="Ngày giờ PET" type="datetime-local" data-date="${i}" value="${esc(r.date||'')}"><span class="label">PET ${i+1}</span><select data-laser="${i}">${"123456789ABCDEFGHI".split("").map(h=>`<option value="${h}" ${h===(r.laser||"1")?"selected":""}>Laser ${h}</option>`).join("")}</select><button class="secondary" data-del="${i}">Xóa</button></div>`).join(''):'<p class="muted">Chưa có PET; chọn file CSV để bắt đầu.</p>';document.querySelectorAll('[data-on]').forEach(e=>e.onchange=()=>{db.runs[+e.dataset.on].on=e.checked;save();renderFiles()});document.querySelectorAll('[data-del]').forEach(e=>e.onclick=()=>{db.runs.splice(+e.dataset.del,1);save();renderFiles()});document.querySelectorAll('[data-laser]').forEach(e=>e.onchange=()=>{db.runs[+e.dataset.laser].laser=e.value;save();renderFiles()});document.querySelectorAll('[data-date]').forEach(e=>e.onchange=()=>{db.runs[+e.dataset.date].date=e.value;save()})};function renderNominal(){$('nominalRows').innerHTML=Array.from({length:88},(_,j)=>{const p=j<81?(validNom()?db.nominal[j]:null):(extraNom()||[])[j-81];return `<tr><td>${j<81?'FAI9-'+(j+1):extraLabel(j+1)}</td><td><input type="number" step="any" data-nx="${j}" value="${p?p.x:''}"></td><td><input type="number" step="any" data-ny="${j}" value="${p?p.y:''}"></td></tr>`}).join('')};function readNominal(){const next=[];for(let j=0;j<88;j++){const a=document.querySelector(`[data-nx="${j}"]`).value.trim(),b=document.querySelector(`[data-ny="${j}"]`).value.trim();if(!a||!b||!Number.isFinite(Number(a))||!Number.isFinite(Number(b)))throw Error('Target thiếu hoặc không hợp lệ: '+(j<81?'FAI9-'+(j+1):extraLabel(j+1)));next.push({x:+a,y:+b})}return next};$('saveNominal').onclick=()=>{try{const a=readNominal();db.nominal=a.slice(0,81);db.lineExtraNominals[lineOf(currentLaser)]=a.slice(81);save();alert('Đã lưu Target Nominal của 88 điểm.')}catch(e){alert(e.message)}};$('fromFile').onclick=()=>{if(!allLaser().length)return alert('Hãy nhập PET vào đầu Laser hiện tại trước.');if(!confirm('Lấy Nominal từ file PET đầu tiên làm TARGET tham khảo? Bạn cần xác nhận đó là Nominal chuẩn của Laser trước khi dùng.'))return;db.nominal=allLaser()[0].points.map(p=>({x:p.nx,y:p.ny}));const a=allLaser()[0].extraNominalPoints||[];if(a.length===7&&a.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)))db.lineExtraNominals[lineOf(currentLaser)]=a;save();renderNominal();renderExtraNominal()};function parseNominalExcel(raw){
+ const lines=raw.replace(/\uFEFF/g,'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ const data=[];
+ for(const line of lines){
+  let c=line.split('\t').map(v=>v.trim());
+  if(c.length===1)c=line.split(';').map(v=>v.trim());
+  if(c.length===1)c=line.split(/\s+/).map(v=>v.trim());
+  if(!c.some(x=>x))continue;
+  if(c.some(v=>/^(featurelabel|nominal|point|target x|target y|x \(mm\)|y \(mm\))$/i.test(v)))continue;
+  let tag='',x='',y='';
+  const named=c.findIndex(v=>/^(?:FAI\s*(?:9|15|16)\s*[-–]\s*\d+|O[45])$/i.test(v));
+  if(named>=0){tag=c[named].replace(/\s/g,'');x=c[named+1];y=c[named+2]}
+  else if(c.length>=4&&/^\d+$/.test(c[0])){tag=c[1];x=c[2];y=c[3]}
+  else if(c.length===3&&/^\d+$/.test(c[0])){tag=Number(c[0])<=81?'FAI9-'+c[0]:extraLabel(Number(c[0]));x=c[1];y=c[2]}
+  else if(c.length===2){[x,y]=c}
+  else throw Error('Không nhận dạng được cấu trúc tại hàng '+(data.length+1)+': '+line.slice(0,80));
+  const number=v=>{if(v===undefined||v==='')return NaN;return Number(String(v).replace(/,/g,'.'))};
+  const nx=number(x),ny=number(y);
+  if(!Number.isFinite(nx)||!Number.isFinite(ny))throw Error('X/Y không hợp lệ tại hàng '+(data.length+1)+': '+line.slice(0,80));
+  const expected=data.length<81?'FAI9-'+(data.length+1):extraLabel(data.length+1);if(tag&&tag.toUpperCase()!==expected.toUpperCase())throw Error('Sai thứ tự điểm: chờ '+expected+', nhận '+tag);
+  data.push({x:nx,y:ny});
+ }
+ if(data.length!==88)throw Error('Cần đúng 88 hàng (81 FAI9 và 7 điểm phụ); hiện nhận '+data.length); 
+ return data;
+}
+function applyPastedNominal(){
+ try{const arr=parseNominalExcel($('pasteNominal').value);
+   db.nominal=arr.slice(0,81);db.lineExtraNominals[lineOf(currentLaser)]=arr.slice(81);save();renderNominal();renderExtraNominal();
+   $('pasteFeedback').className='status pass';$('pasteFeedback').textContent='✓ Đã nhập '+arr.length+' cặp Nominal X/Y cho '+lineOf(currentLaser); 
+ }catch(e){$('pasteFeedback').className='status fail';$('pasteFeedback').textContent='✗ '+e.message}
+}
+$('applyPaste').onclick=applyPastedNominal;
+$('pasteNominal').addEventListener('paste',()=>{setTimeout(applyPastedNominal,0)});
+$('clearPaste').onclick=()=>{$('pasteNominal').value='';$('pasteFeedback').className='status';$('pasteFeedback').textContent='Đã xóa vùng dán; Nominal đã lưu không bị xóa.'};function tsv(noms=false){if(noms)return [...db.nominal,...(extraNom()||[])].map(p=>fmt(p.x)+'\t'+fmt(p.y)).join('\n');return rows().map(p=>fmt(p.x)+'\t'+fmt(p.y)).join('\n')}async function copy(s){try{await navigator.clipboard.writeText(s);alert('Đã sao chép. Dán Ctrl+V vào Excel.')}catch{const t=document.createElement('textarea');t.value=s;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();alert(ok?'Đã sao chép. Dán Ctrl+V vào Excel.':'Trình duyệt chặn copy; hãy dùng file CSV.')}}$('copyNominal').onclick=()=>validNom()&&extraNom()?.length===7?copy(tsv(true)):alert('Chưa đủ 88 Nominal.');$('copyXY').onclick=()=>rows().length?copy(tsv()):alert('Chưa có PET được chọn.');const cols=['FAI9','Mean_Actual_X','Mean_Actual_Y','Target_X','Target_Y','Delta_X','Delta_Y','TP2D_of_Mean','SD_X','SD_Y','Max_TP2D_per_PET','Status'];function fullLines(){return rows().map(p=>['FAI9-'+p.i,p.x,p.y,p.tx,p.ty,p.dx,p.dy,p.tp,p.sx,p.sy,p.max,stateText(p)].map((x,j)=>typeof x==='number'?fmt(x):x).join('\t')).join('\n')};$('copyFull').onclick=()=>rows().length?copy(cols.join('\t')+'\n'+fullLines()):alert('Chưa có PET.');function dl(name,body,type='text/csv;charset=utf-8'){const a=document.createElement('a'),url=URL.createObjectURL(new Blob(['\uFEFF'+body],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}$('csvXY').onclick=()=>rows().length?dl('FAI9_Mean_XY.csv','FAI9,Mean_Actual_X,Mean_Actual_Y\r\n'+rows().map(p=>`FAI9-${p.i},${fmt(p.x)},${fmt(p.y)}`).join('\r\n')):alert('Chưa có PET.');$('csvFull').onclick=()=>rows().length?dl('FAI9_Analysis.csv',cols.join(',')+'\r\n'+fullLines().replaceAll('\t',',').replaceAll('\n','\r\n')):alert('Chưa có PET.');function renderResult(){viewMode=$('analysisMode').value;const r=rows(),has=validNom(),ng=r.filter(p=>p.tp>spec()||deltaBadX(p)||deltaBadY(p)).length,warn=r.filter(p=>p.n>1&&(p.sx>sigma()||p.sy>sigma())).length;$('resultMsg').textContent=!r.length?'Chưa có dữ liệu PET được chọn.':!has?'Chưa nhập đầy đủ Target Nominal: vẫn có thể xuất Mean X/Y, nhưng chưa đánh giá sai lệch.':`Đang phân tích ${active().length} PET, 81 điểm. TP2D tính theo tọa độ trung bình; Max TP2D/PET phản ánh sai lệch cực đại của PET đơn lẻ.`;$('stats').innerHTML=[[r.length?active().length:'0','PET đang chọn'],[r.length?'81':'0','Vị trí FAI9'],[has?ng:'—','Điểm Mean NG'],[has?warn:'—','Điểm dao động cao'],[has&&r.length?fmt(Math.max(...r.map(p=>p.tp))):'—','Max TP2D Mean (mm)']].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');$('resultRows').innerHTML=r.map(p=>`<tr><td>FAI9-${p.i}</td>${[p.x,p.y,p.tx,p.ty,p.dx,p.dy,p.tp,p.sx,p.sy,p.max].map((n,j)=>`<td class="${j===4&&deltaBadX(p)||j===5&&deltaBadY(p)?'delta-ng':''}" ${j===4&&deltaBadX(p)||j===5&&deltaBadY(p)?'title="Vượt giới hạn ± Delta"':''}>${fmt(n)}</td>`).join('')}<td class="${p.tp>spec()||deltaBadX(p)||deltaBadY(p)?'fail':p.n>1&&(p.sx>sigma()||p.sy>sigma())?'warn':'pass'}">${stateText(p)}</td></tr>`).join('')};$('recalc').onclick=()=>{if(!(spec()>0&&sigma()>0&&Number.isFinite(deltaXLimit())&&deltaXLimit()>=0&&Number.isFinite(deltaYLimit())&&deltaYLimit()>=0))return alert('Giới hạn TP2D và σ phải lớn hơn 0; giới hạn ±ΔX/±ΔY không được âm.');db.spec=spec();db.sigma=sigma();db.deltaXSpec=deltaXLimit();db.deltaYSpec=deltaYLimit();save();renderResult()};$('spec').value=db.spec;$('sigmaSpec').value=db.sigma;$('deltaXSpec').value=Number.isFinite(db.deltaXSpec)?db.deltaXSpec:.010;$('deltaYSpec').value=Number.isFinite(db.deltaYSpec)?db.deltaYSpec:.010;function drawTrend(i){const arr=active().map((r,j)=>({j,x:r.points[i-1].x-db.nominal[i-1].x,y:r.points[i-1].y-db.nominal[i-1].y}));const svg=$('trend');if(!arr.length){svg.innerHTML='';return}const max=Math.max(.001,...arr.flatMap(p=>[Math.abs(p.x),Math.abs(p.y)]))*1.18,xx=k=>42+(arr.length<2?270:k*568/(arr.length-1)),yy=v=>112-v/max*88;const path=k=>arr.map((p,j)=>(j?'L':'M')+xx(j).toFixed(1)+' '+yy(p[k]).toFixed(1)).join(' ');svg.innerHTML=`<rect x="0" y="0" width="650" height="225" rx="8" fill="#0b192d"/><line x1="42" y1="112" x2="620" y2="112" stroke="#64788a" stroke-dasharray="4 4"/><text x="2" y="18" fill="#b3cce3" font-size="12">+${fmt(max,3)}</text><text x="2" y="209" fill="#b3cce3" font-size="12">−${fmt(max,3)}</text><text x="42" y="215" fill="#b3cce3" font-size="12">PET 1</text><text x="575" y="215" fill="#b3cce3" font-size="12">${arr.length} PET</text><path d="${path('x')}" fill="none" stroke="#43bff7" stroke-width="2.6"/><path d="${path('y')}" fill="none" stroke="#f1c06b" stroke-width="2.6"/>`};function heatColor(v,max){
+  if(!Number.isFinite(v)||!Number.isFinite(max)||max<=0)return 'hsl(215 35% 30%)';
+  const r=Math.max(0,Math.min(1,v/max));
+  const hue=220-(220*r); /* blue -> red */
+  const light=42 + (1-r)*8;
+  const sat=78;
+  return `hsl(${hue} ${sat}% ${light}%)`;
+}
+function quantileBox(sorted,q){const pos=(sorted.length-1)*q,lo=Math.floor(pos),hi=Math.ceil(pos);return sorted[lo]+(sorted[hi]-sorted[lo])*(pos-lo)}
+function renderBoxPlot(axis){const svg=$(axis==='X'?'boxplotX':'boxplotY');const rr=active();if(!validNom()||!rr.length){svg.setAttribute('viewBox','0 0 950 375');svg.innerHTML='<text x="25" y="50" fill="#bdd8ed" font-size="15">Hãy nhập PET và đủ 81 Nominal chuẩn để xem Box Plot.</text>';return}
+ const all=Array.from({length:81},(_,j)=>rr.map(p=>p.points[j][axis.toLowerCase()]-db.nominal[j][axis.toLowerCase()]).sort((a,b)=>a-b));
+ const bound=Math.max(0.001,...rr.flatMap(a=>a.points.flatMap((p,j)=>[Math.abs(p.x-db.nominal[j].x),Math.abs(p.y-db.nominal[j].y)])))*1.12;
+ const width=81*42+110,height=375,top=28,bottom=65,left=70,right=25;
+ const y=v=>top+(bound-v)*((height-top-bottom)/(2*bound));const x=i=>left+i*42+19;
+ const bits=[`<rect width="${width}" height="${height}" fill="#0b192d"/>`];
+ for(let k=-4;k<=4;k++){let v=bound*k/4,Y=y(v);bits.push(`<line x1="${left-8}" y1="${Y}" x2="${width-right}" y2="${Y}" stroke="${k===0?'#f8cc65':'#2c425c'}" stroke-width="${k===0?2:1}" ${k===0?'stroke-dasharray="8 4"':''}/><text x="${left-14}" y="${Y+4}" text-anchor="end" fill="${k===0?'#f8cc65':'#acc3dd'}" font-size="11">${fmt(v,3)}</text>`)}
+ for(let i=0;i<81;i++){
+  let a=all[i],X=x(i),q1=quantileBox(a,.25),median=quantileBox(a,.5),q3=quantileBox(a,.75),iqr=q3-q1;
+  let low=a.find(v=>v>=q1-1.5*iqr-1e-12),high=[...a].reverse().find(v=>v<=q3+1.5*iqr+1e-12);
+  if(low===undefined)low=a[0];if(high===undefined)high=a[a.length-1];
+  let yq=y(q3),yb=y(q1),fill=axis==='X'?'#21b2e7':'#23caab';
+  bits.push(`<g><title>FAI9-${i+1} | ${axis} | n=${a.length} | Min=${fmt(a[0])} | Q1=${fmt(q1)} | Median=${fmt(median)} | Q3=${fmt(q3)} | Max=${fmt(a[a.length-1])}</title><line x1="${X}" y1="${y(high)}" x2="${X}" y2="${y(low)}" stroke="#dceaf9" stroke-width="1.6"/><line x1="${X-6}" y1="${y(high)}" x2="${X+6}" y2="${y(high)}" stroke="#dceaf9"/><line x1="${X-6}" y1="${y(low)}" x2="${X+6}" y2="${y(low)}" stroke="#dceaf9"/><rect x="${X-12}" y="${yq}" width="24" height="${Math.max(1,yb-yq)}" fill="${fill}" fill-opacity=".78" stroke="#c8ebfb"/><line x1="${X-12}" y1="${y(median)}" x2="${X+12}" y2="${y(median)}" stroke="#111827" stroke-width="2.4"/>`);
+  for(const v of a.filter(v=>v<low-1e-12||v>high+1e-12))bits.push(`<circle cx="${X}" cy="${y(v)}" r="2.9" fill="#ff816d"/>`);
+  bits.push(`<text x="${X}" y="${height-46}" text-anchor="end" transform="rotate(-56 ${X} ${height-46})" fill="#adc7df" font-size="10">${i+1}</text></g>`);
+ }
+ bits.push(`<text x="18" y="17" fill="#bcd5ee" font-size="12">Deviation ${axis} (mm)</text><text x="${width-90}" y="${height-7}" fill="#bcd5ee" font-size="12">FAI9</text>`);
+ svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width);svg.setAttribute('height',height);svg.innerHTML=bits.join('');
+}
+function renderMap(){viewMode=$('mapMode').value;renderBoxPlot('X');renderBoxPlot('Y');const r=rows();if(!r.length){$('grid').innerHTML='<p class="muted">Chưa có PET.</p>';$('detail').textContent='Chưa có dữ liệu';$('trend').innerHTML='';$('riskRows').innerHTML='';const hm=$('heatMaxLabel'); if(hm) hm.textContent='Cao';return}const has=validNom(); const axis=$('heatAxis').value;const vals = has ? r.map(p=>axis==='X'?p.dx:p.dy) : []; const localMin = vals.length ? Math.min(...vals) : 0; const localMax = vals.length ? Math.max(...vals) : 0; const hm=$('heatMaxLabel'); if(hm) hm.textContent=has?(axis+' Max '+fmt(localMax,3)+' mm · Min '+fmt(localMin,3)+' mm'):'Cao'; $('grid').innerHTML=r.map(p=>{ const bg = has ? heatColor((axis==='X'?p.dx:p.dy)-localMin, localMax-localMin||1) : 'hsl(215 35% 30%)'; const ring = !has ? '#37597a' : '#ffffff88'; return `<div tabindex="0" role="button" data-pt="${p.i}" class="pt" style="background:${bg};border-color:${ring}"><span>FAI9-${p.i}</span><strong>${has?fmt(axis==='X'?p.dx:p.dy,3):'—'}</strong><small>${has?('ΔX '+fmt(p.dx,3)+' | ΔY '+fmt(p.dy,3)):'Chưa có Nominal'}</small></div>`}).join('');document.querySelectorAll('[data-pt]').forEach(e=>{e.onclick=()=>{selected=+e.dataset.pt;pointDetail()};e.onkeydown=ev=>{if(ev.key==='Enter')e.click()}});$('riskRows').innerHTML=r.filter(p=>p.n>1).sort((a,b)=>Math.max(b.sx,b.sy)-Math.max(a.sx,a.sy)).slice(0,15).map(p=>`<tr><td>FAI9-${p.i}</td><td>${fmt(p.sx,3)}</td><td>${fmt(p.sy,3)}</td><td>${fmt(p.tp,3)}</td><td>${fmt(p.max,3)}</td></tr>`).join('');pointDetail()};
+function rangeData(){const runs=allLaser();if(!runs.length||!validNom())return[];return Array.from({length:81},(_,i)=>{const n=db.nominal[i],xs=runs.map(v=>v.points[i].x),ys=runs.map(v=>v.points[i].y),dxs=xs.map(v=>v-n.x),dys=ys.map(v=>v-n.y),mx=mean(xs),my=mean(ys),dx=mx-n.x,dy=my-n.y,LX=deltaXLimit(),LY=deltaYLimit();const meanOK=Math.abs(dx)<=LX&&Math.abs(dy)<=LY,allOK=dxs.every(v=>Math.abs(v)<=LX)&&dys.every(v=>Math.abs(v)<=LY);return {i:i+1,mx,my,nx:n.x,ny:n.y,dx,dy,minX:Math.min(...dxs),maxX:Math.max(...dxs),minY:Math.min(...dys),maxY:Math.max(...dys),sx:sd(xs),sy:sd(ys),meanOK,allOK}})}
+function rangeCard(v,label,status=''){return `<div class="rangeCard ${status}"><b>${v}</b><span>${label}</span></div>`}
+function renderRange(){const target=$('rangeRows');if(!target)return;$('rangeLimitX').value=deltaXLimit();$('rangeLimitY').value=deltaYLimit();const runs=allLaser(),r=rangeData();if(!r.length){$('rangeSummary').innerHTML=rangeCard(runs.length,'PET đã nạp')+rangeCard('—','Chưa có 81 Nominal hợp lệ');target.innerHTML='';$('rangeMsg').textContent='Cần nhập PET và Nominal của Line trước khi đánh giá.';return}
+const m=r.filter(x=>x.meanOK).length,a=r.filter(x=>x.allOK).length,meanX=mean(r.map(x=>x.dx)),meanY=mean(r.map(x=>x.dy));$('rangeSummary').innerHTML=rangeCard(runs.length,'PET đang lưu')+rangeCard(fmt(meanX),'Mean ΔX toàn 81 điểm (mm)',Math.abs(meanX)<=deltaXLimit()?'ok':'ng')+rangeCard(fmt(meanY),'Mean ΔY toàn 81 điểm (mm)',Math.abs(meanY)<=deltaYLimit()?'ok':'ng')+rangeCard(`${m}/81`,'Điểm Mean OK',m===81?'ok':'ng')+rangeCard(`${a}/81`,'Điểm có toàn dải PET OK',a===81?'ok':'ng');$('rangeMsg').textContent=`${81-m} điểm có trung bình vượt ngưỡng; ${81-a} điểm có ít nhất một PET vượt ngưỡng ±X/±Y. ${a===81?'Toàn bộ giá trị đo trong ngưỡng đã cài đặt.':'Cần xem các điểm NG trong bảng bên dưới.'}`;
+const val=(v,bad)=>`<td class="${bad?'rangeBad':''}">${fmt(v)}</td>`;const tag=ok=>`<span class="rangeTag ${ok?'ok':'ng'}">${ok?'OK':'NG'}</span>`;target.innerHTML=r.map(p=>`<tr><td>FAI9-${p.i}</td>${val(p.mx,false)}${val(p.my,false)}${val(p.nx,false)}${val(p.ny,false)}${val(p.dx,Math.abs(p.dx)>deltaXLimit())}${val(p.dy,Math.abs(p.dy)>deltaYLimit())}${val(p.minX,Math.abs(p.minX)>deltaXLimit())}${val(p.maxX,Math.abs(p.maxX)>deltaXLimit())}${val(p.minY,Math.abs(p.minY)>deltaYLimit())}${val(p.maxY,Math.abs(p.maxY)>deltaYLimit())}${val(p.sx,false)}${val(p.sy,false)}<td>${tag(p.meanOK)}</td><td>${tag(p.allOK)}</td></tr>`).join('')}
+$('applyRangeLimits').onclick=()=>{const x=Number($('rangeLimitX').value),y=Number($('rangeLimitY').value);if(!Number.isFinite(x)||!Number.isFinite(y)||x<=0||y<=0)return alert('Giới hạn X/Y phải lớn hơn 0.');db.deltaXSpec=x;db.deltaYSpec=y;$('deltaXSpec').value=x;$('deltaYSpec').value=y;save();renderRange();renderResult()};
+$('copyRangeTable').onclick=()=>{const r=rangeData();if(!r.length)return alert('Chưa có đủ PET và Nominal.');const h=['Point','Mean_X','Mean_Y','Nominal_X','Nominal_Y','Mean_Delta_X','Mean_Delta_Y','Min_Delta_X','Max_Delta_X','Min_Delta_Y','Max_Delta_Y','SD_X','SD_Y','Mean_Status','All_PET_Status'];const lines=r.map(p=>[p.i,p.mx,p.my,p.nx,p.ny,p.dx,p.dy,p.minX,p.maxX,p.minY,p.maxY,p.sx,p.sy,p.meanOK?'OK':'NG',p.allOK?'OK':'NG'].map(v=>typeof v==='number'?fmt(v):v).join('	'));copy(h.join('\t')+'\n'+lines.join('\n'))};
+function pointDetail(){const p=rows()[selected-1];if(!p)return;$('pointTitle').textContent=`FAI9-${selected} · Chi tiết`;$('detail').innerHTML=`<p><b>Mean Actual:</b> X = ${fmt(p.x,3)} | Y = ${fmt(p.y,3)}</p><p><b>Target:</b> X = ${fmt(p.tx,3)} | Y = ${fmt(p.ty,3)}</p><p><b>ΔX:</b> ${fmt(p.dx,3)} | <b>ΔY:</b> ${fmt(p.dy,3)} | <b>TP2D:</b> ${fmt(p.tp,3)}</p><p><b>σX:</b> ${fmt(p.sx,3)} | <b>σY:</b> ${fmt(p.sy,3)} | <b>Max TP2D/PET:</b> ${fmt(p.max,3)}</p><p><b>Đánh giá:</b> ${esc(stateText(p))}</p>`;if(validNom())drawTrend(selected);else $('trend').innerHTML=''};async function importOne(f){const content=await f.text(),p=E.csvToPoints(content);if(db.runs.some(r=>(r.laser||"1")===currentLaser&&fileKey(r.points)===fileKey(p)))throw Error('PET trùng hoàn toàn với dữ liệu đã có');db.runs.push({name:f.name,date:new Date(f.lastModified||Date.now()).toISOString().slice(0,16),on:true,laser:currentLaser,points:p,extra:extraMeasurements(content),extraPoints:parseExtraFromCsv(content),extraNominalPoints:parseExtraNomFromCsv(content)})}async function importFiles(fs){let ok=0,errs=[];for(const f of fs){try{if(f.size>15e6)throw Error('File quá 15MB');if(!/\.csv$/i.test(f.name))throw Error('Vui lòng xuất Excel về CSV UTF-8');await importOne(f);ok++}catch(e){errs.push(f.name+': '+e.message)}}save();renderFiles();$('msg').textContent=`Đã thêm ${ok} PET. ${errs.length?'Lỗi: '+errs.join(' | '):''}`;$('msg').className='status '+(errs.length?'warn':'pass')};$('add').onclick=()=>{$('files').files.length?importFiles([...$('files').files]):alert('Hãy chọn file CSV trước.')};$('files').onchange=()=>{$('msg').textContent=`Đã chọn ${$('files').files.length} file. Nhấn + Thêm PET để nhập.`};$('loadExample').onclick=async()=>{try{const f=await fetch('du_lieu_mau.csv');if(!f.ok)throw Error('Không tải được');await importFiles([new File([await f.text()],'PET_mau.csv',{type:'text/csv'})])}catch(e){alert('Trình duyệt chặn tải file mẫu khi mở offline. Hãy chọn du_lieu_mau.csv bằng nút Chọn file.')}};$('deleteSelected').onclick=()=>{if(!confirm('Xóa những PET đang bỏ chọn?'))return;db.runs=db.runs.filter(r=>r.on);save();renderFiles()};$('clearAll').onclick=()=>{if(!confirm('Xóa toàn bộ lịch sử PET? Nominal vẫn được giữ.'))return;db.runs=[];save();renderFiles()};$('exportBackup').onclick=()=>dl('PET81_backup.json',JSON.stringify({type:'PET81_V2_BACKUP',data:db}), 'application/json');$('restoreBtn').onclick=()=>$('restoreFile').click();$('restoreFile').onchange=async()=>{try{const obj=JSON.parse(await $('restoreFile').files[0].text());if(obj.type!=='PET81_V2_BACKUP'||!Array.isArray(obj.data.runs)||obj.data.runs.some(r=>!Array.isArray(r.points)||r.points.length!==81))throw Error('Backup không hợp lệ');if(!confirm('Khôi phục sẽ thay toàn bộ PET và Nominal hiện tại. Tiếp tục?'))return;db=obj.data;db.lineExtraNominals=db.lineExtraNominals||{};db.lineNominals=db.lineNominals||{};db.lineHoleNominals=db.lineHoleNominals||{};attachLineNominals();save();renderFiles();renderNominal();renderHoleNominal();updateLimits();$('spec').value=db.spec;$('sigmaSpec').value=db.sigma;alert('Đã khôi phục')}catch(e){alert(e.message)}};
+
+const EXTRA_LABELS=['FAI16-1','FAI15-1','FAI16-2','O5','O4','FAI15-2','FAI16-3'];
+function extraLabel(i){return EXTRA_LABELS[i-82]||"FAI9-"+i}
+function parsePairs(raw,start,count){
+ const lines=raw.replace(/\uFEFF/g,'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+ const a=[];
+ for(const line of lines){let c=line.split('\t').map(x=>x.trim());if(c.length===1)c=line.split(';').map(x=>x.trim());if(c.length===1)c=line.split(/\s+/).map(x=>x.trim());
+  if(c.length>=3 && /^(FAI\d+-\d+|O[45])$/i.test(c[0])){const expected=extraLabel(start+a.length);if(c[0].toUpperCase()!==expected.toUpperCase())throw Error('Sai thứ tự: chờ '+expected);c=c.slice(1)}
+  else if(c.length>=4&&/^\d+$/.test(c[0])){if(+c[0]!==start+a.length)throw Error('Sai vị trí '+c[0]);c=c.slice(2)}
+  else if(c.length===3&&/^\d+$/.test(c[0])){if(+c[0]!==start+a.length)throw Error('Sai vị trí '+c[0]);c=c.slice(1)}
+  if(c.length!==2)throw Error('Cần 2 cột X/Y tại hàng '+(a.length+1));const x=Number(c[0].replace(',','.')),y=Number(c[1].replace(',','.'));if(!Number.isFinite(x)||!Number.isFinite(y))throw Error('X/Y không hợp lệ tại hàng '+(a.length+1));a.push({x,y});
+ }
+ if(a.length!==count)throw Error('Cần đủ '+count+' hàng; hiện có '+a.length);return a;
+}
+function parseExtraFromCsv(text){
+ const rr=window.PETEngine.parseCsv(text),m=new Map();
+ for(const v of rr){
+  const label=(v.FeatureLabel||'').trim().toUpperCase();
+  if(!EXTRA_LABELS.some(a=>a.toUpperCase()===label))continue;
+  const field=v.OutputItem==='Coord_X'?'x':v.OutputItem==='Coord_Y'?'y':null;
+  if(!field||v.Actual==='')continue;
+  const n=Number(v.Actual);if(!Number.isFinite(n))continue;
+  if(!m.has(label))m.set(label,{});
+  m.get(label)[field]=n;
+ }
+ return EXTRA_LABELS.map(k=>{if(k==='O4'||k==='O5')return {x:0,y:0};const p=m.get(k.toUpperCase());return p&&Number.isFinite(p.x)&&Number.isFinite(p.y)?p:null});
+}
+function parseExtraNomFromCsv(text){
+ const rr=window.PETEngine.parseCsv(text),m=new Map();
+ for(const v of rr){const label=(v.FeatureLabel||'').trim().toUpperCase();if(!EXTRA_LABELS.some(z=>z.toUpperCase()===label))continue;
+ const key=v.OutputItem==='Coord_X'?'x':v.OutputItem==='Coord_Y'?'y':null;
+ if(!key||v.Nominal==='')continue;const n=Number(v.Nominal);if(!Number.isFinite(n))continue;
+ if(!m.has(label))m.set(label,{});m.get(label)[key]=n;}
+ return EXTRA_LABELS.map(z=>{if(z==='O4'||z==='O5')return {x:0,y:0};const a=m.get(z.toUpperCase());return a&&Number.isFinite(a.x)&&Number.isFinite(a.y)?a:null});
+}
+function extraNom(){const a=db.lineExtraNominals[lineOf(currentLaser)];if(!Array.isArray(a)||a.length!==7)return null;return a.map((p,j)=>(j===3||j===4)?{x:0,y:0}:p)}
+function renderExtraNominal(){const a=extraNom();$('extraNomRows').innerHTML=Array.from({length:7},(_,j)=>`<tr><td>${extraLabel(j+82)}</td><td>${a&&a[j]?fmt(a[j].x,3):'—'}</td><td>${a&&a[j]?fmt(a[j].y,3):'—'}</td></tr>`).join('')}
+$('applyExtraNominal').onclick=()=>{try{db.lineExtraNominals[lineOf(currentLaser)]=parsePairs($('extraNominalPaste').value,82,7).map((p,j)=>(j===3||j===4)?{x:0,y:0}:p);save();renderExtraNominal();alert('Đã lưu 7 Nominal phụ cho '+lineOf(currentLaser))}catch(e){alert(e.message)}};
+function newestRun(){const a=allLaser();return a.length?a[a.length-1]:null}
+function offsetData(){const run=newestRun();if(!run)return[];const nom=validNom()?db.nominal:null;const aux=extraNom();return Array.from({length:88},(_,j)=>{const isExtra=j>=81;const p=isExtra?((j===84||j===85)?{x:0,y:0}:(run.extraPoints||[])[j-81]):run.points[j];const n=isExtra?((j===84||j===85)?{x:0,y:0}:(aux||[])[j-81]):(nom||[])[j];return {i:j+1,actual:p||null,nom:n||null,extra:isExtra,dx:p&&n?n.x-p.x:NaN,dy:p&&n?n.y-p.y:NaN}})}
+function renderOffset(){ $('offsetLine').textContent=lineOf(currentLaser); const run=newestRun();const a=offsetData();$('offsetStatus').textContent=run?'Laser '+currentLaser+' | PET cuối cùng: '+run.name+' | '+(run.date||'không có thời gian')+' | 81 điểm chính: '+(validNom()?'Nominal đủ':'CHƯA ĐỦ NOMINAL')+' | 7 điểm phụ: '+a.slice(81).filter(p=>Number.isFinite(p.dx)&&Number.isFinite(p.dy)).length+'/7 cặp Offset hợp lệ (thiếu: '+a.slice(81).filter(p=>!Number.isFinite(p.dx)||!Number.isFinite(p.dy)).map(p=>extraLabel(p.i)).join(', ')+')':'Chưa có PET của Laser '+currentLaser+'. Hãy nhập CSV trước.';$('offsetRows').innerHTML=a.length?a.map(p=>`<tr><td>${p.extra?extraLabel(p.i):"FAI9-"+p.i}</td><td>${p.nom?fmt(p.nom.x):'—'}</td><td>${p.nom?fmt(p.nom.y):'—'}</td><td>${p.actual?fmt(p.actual.x):'—'}</td><td>${p.actual?fmt(p.actual.y):'—'}</td><td class="${Number.isFinite(p.dx)?'ok':''}">${fmt(p.dx)}</td><td class="${Number.isFinite(p.dy)?'ok':''}">${fmt(p.dy)}</td></tr>`).join(''):'<tr><td colspan="7">Chưa có dữ liệu PET</td></tr>'}
+$('applyExtraActual').onclick=()=>{const run=newestRun();if(!run)return alert('Chưa có PET');try{run.extraPoints=parsePairs($('extraActualPaste').value,82,7).map((p,j)=>(j===3||j===4)?{x:0,y:0}:p);save();renderOffset();alert('Đã lưu Actual 7 điểm phụ vào PET '+run.name)}catch(e){alert(e.message)}};
+function offsetText(all=false,full=false){const arr=offsetData().slice(0,all?88:81);if(!arr.length)return '';if(arr.some(p=>!Number.isFinite(p.dx)||!Number.isFinite(p.dy)))return '';const head=full?'Point,Nominal_X,Nominal_Y,Actual_X,Actual_Y,Offset_X,Offset_Y\n':'';return head+arr.map(p=>full?[(p.extra?extraLabel(p.i):'FAI9-'+p.i),p.nom.x,p.nom.y,p.actual.x,p.actual.y,p.dx,p.dy].map((v,k)=>k?fmt(v,6):v).join(','):fmt(p.dx,6)+'\t'+fmt(p.dy,6)).join(full?'\n':'\n')}
+$('copyOffset').onclick=()=>{const t=offsetText(false,false);if(!t)return alert('Chưa đủ 81 Nominal/Actual');copy(t)};
+$('copyOffsetAll').onclick=()=>{const t=offsetText(true,false);if(!t)return alert('Chưa đủ 88 Nominal/Actual. Hãy nhập điểm phụ.');copy(t)};
+$('csvOffset').onclick=()=>{const t=offsetText(true,true)||offsetText(false,true);if(!t)return alert('Chưa đủ Nominal/Actual');dl('Laser_'+currentLaser+'_Offset_'+(t.split('\n').length-1)+'pts.csv',t)};
+const heads='123456789ABCDEFGHI'.split('');function drawHeads(){ $('laserHeads').innerHTML=heads.map(h=>`<button type="button" data-head="${h}" data-line="${lineOf(h)}" class="${h===currentLaser?'active':''}">${h}</button>`).join('');document.querySelectorAll('[data-head]').forEach(e=>e.onclick=()=>{currentLaser=e.dataset.head;drawHeads();renderNominal();renderHoleNominal();if(!$('result').classList.contains('hidden'))renderResult();if(!$('map').classList.contains('hidden'))renderMap();if(!$('dashboard').classList.contains('hidden'))renderDashboard();if(!$('offset').classList.contains('hidden'))renderOffset();renderExtraNominal()});$('laserContext').textContent='Đang xem Laser '+currentLaser+' · '+allLaser().length+' PET chưa xóa';$('lineCaption').textContent=lineOf(currentLaser);$('nomLineCaption').textContent=lineOf(currentLaser);$('holeLineCaption').textContent=lineOf(currentLaser);document.documentElement.style.setProperty('--line-color',lineOf(currentLaser)==='Line 1'?'#2463e6':lineOf(currentLaser)==='Line 2'?'#159b5e':'#ec8626')}
+$('analysisMode').onchange=()=>{viewMode=$('analysisMode').value;renderResult()};$('mapMode').onchange=()=>{viewMode=$('mapMode').value;renderMap();renderRange()};$('heatAxis').onchange=renderMap;$('dashMode').onchange=renderDashboard;
+function holeNomValid(){return Array.isArray(db.holeNominal)&&db.holeNominal.length===8&&db.holeNominal.every(a=>Number.isFinite(a.x)&&Number.isFinite(a.y))}
+function renderHoleNominal(){ $('holeNomRows').innerHTML=Array.from({length:8},(_,i)=>`<tr><td>FAI2-${i+1}</td><td>${holeNomValid()?fmt(db.holeNominal[i].x):'—'}</td><td>${holeNomValid()?fmt(db.holeNominal[i].y):'—'}</td></tr>`).join('')}
+$('fromHoleFile').onclick=()=>{const a=allLaser().find(r=>r.extra&&Array.isArray(r.extra.holeNominal)&&r.extra.holeNominal.length===8);if(!a)return alert('Hãy nhập lại một CSV gốc theo định dạng V3.7 để lấy Nominal FAI2.');const h=a.extra.holeNominal;if(h.some(o=>!Number.isFinite(o.x)||!Number.isFinite(o.y)))return alert('Nominal FAI2 chưa đủ 8 lỗ');db.holeNominal=h;save();renderHoleNominal()};
+$('applyHoles').onclick=()=>{try{const lines=$('holePaste').value.trim().split(/\r?\n/).filter(Boolean);const a=lines.map((line,i)=>{let c=line.trim().split(/\t|;| {2,}/).filter(Boolean);if(c.length===3){if(!new RegExp('^FAI2-'+(i+1)+'$','i').test(c[0]))throw Error('Sai thứ tự FAI2-'+(i+1));c=c.slice(1)}if(c.length!==2||c.some(v=>!Number.isFinite(Number(v.replace(',','.')))))throw Error('Dữ liệu sai hàng '+(i+1));return{x:Number(c[0].replace(',','.')),y:Number(c[1].replace(',','.'))}});if(a.length!==8)throw Error('Cần đủ 8 hàng');db.holeNominal=a;save();renderHoleNominal();alert('Đã lưu Nominal 8 lỗ')}catch(e){alert(e.message)}};
+if(!db.limits)db.limits={ca:0.1,fai1:2,fai2:0.05};
+function updateLimits(){['ca','fai1','fai2'].forEach((k,i)=>$( ['limCA','limF1','limF2'][i]).value=db.limits[k]);}
+updateLimits();
+$('saveLimits').onclick=()=>{const vals=['limCA','limF1','limF2'].map(id=>Number($(id).value));if(vals.some(v=>!Number.isFinite(v)||v<=0)){alert('Ngưỡng phải lớn hơn 0');return}db.limits={ca:vals[0],fai1:vals[1],fai2:vals[2]};save();renderDashboard()};
+function verdict(ok){return `<b class="${ok?'okresult':'ngresult'}">${ok?'OK':'NG'}</b>`}
+function renderDashboard(){const mode=$('dashMode').value;const runs=mode==='latest'?allLaser().slice(-1):allLaser();const extras=runs.map(r=>r.extra).filter(e=>e&&e.angles&&e.holes&&e.diameters);let ca=extras.flatMap(e=>e.angles);$('dashStats').innerHTML=[[currentLaser,'Đầu Laser'],[runs.length,'Số PET'],[ca.length?fmt(mean(ca))+' · '+(Math.abs(mean(ca))<db.limits.ca?'OK':'NG'):'—','CA trung bình (°) · |CA|<'+fmt(db.limits.ca)],[ca.length?fmt(Math.min(...ca)):'—','CA nhỏ nhất (°)'],[ca.length?fmt(Math.max(...ca)):'—','CA lớn nhất (°)']].map(([v,t],i)=>`<div class="stat ${i===2&&ca.length?(Math.abs(mean(ca))<db.limits.ca?'kpi-ok':'kpi-ng'):''}"><b>${v}</b><span>${t}</span></div>`).join('');const t=(head,body)=>`<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body.join('')}</tbody></table>`;const drows=Array.from({length:8},(_,j)=>{const vals=extras.flatMap(e=>e.diameters[j]);return `<tr><td>FAI1-${j+1}</td><td>${vals.length}</td><td>${vals.length?fmt(mean(vals)):'—'}</td><td>${vals.length>1?fmt(sd(vals)):'—'}</td><td>${vals.length?fmt(Math.min(...vals)):'—'}</td><td>${vals.length?fmt(Math.max(...vals)):'—'}</td><td>${vals.length?verdict(mean(vals)<db.limits.fai1):'—'}</td></tr>`});$('fai1table').innerHTML=t(['Lỗ','Số đo','Mean diameter','σ','Min','Max','Kết quả'],drows);const prows=Array.from({length:8},(_,j)=>{const vals=extras.flatMap(e=>e.holes[j]);const x=vals.map(v=>v.x),y=vals.map(v=>v.y),mn=holeNomValid()?db.holeNominal[j]:null,dx=mn&&x.length?mean(x)-mn.x:NaN,dy=mn&&y.length?mean(y)-mn.y:NaN,tp=2*Math.hypot(dx,dy);return `<tr><td>FAI2-${j+1}</td><td>${x.length}</td><td>${x.length?fmt(mean(x)):'—'}</td><td>${y.length?fmt(mean(y)):'—'}</td><td>${fmt(dx)}</td><td>${fmt(dy)}</td><td>${fmt(tp)}</td><td>${mn&&x.length?fmt(mean(vals.map(p=>2*Math.hypot(p.x-mn.x,p.y-mn.y)))):'—'}</td><td>${mn&&x.length?verdict(Math.abs(dx)<db.limits.fai2&&Math.abs(dy)<db.limits.fai2):'—'}</td></tr>`});$('fai2table').innerHTML=t(['Lỗ','Số đo','Mean X','Mean Y','ΔX','ΔY','TP2D mean XY','Mean TP2D/mẫu','Kết quả ±'+fmt(db.limits.fai2)],prows);const carows=Array.from({length:81},(_,j)=>{const vals=extras.map(e=>e.angles[j]);return `<tr><td>${Math.floor(j/9)+1}.${j%9+1}</td><td>${vals.length}</td><td>${vals.length?fmt(mean(vals)):'—'}</td><td>${vals.length>1?fmt(sd(vals)):'—'}</td></tr>`});$('caDetails').innerHTML=t(['PET vị trí','Số PET','Mean CA (°)','σ CA (°)'],carows);if(!extras.length)$('dashStats').insertAdjacentHTML('afterend','<p class="warn">PET cũ từ V2.5 không lưu dữ liệu FAI1/FAI2/CA. Hãy nhập lại file CSV gốc để hiển thị các chỉ số mở rộng.</p>')}
+drawHeads();renderFiles();renderNominal();renderExtraNominal();renderHoleNominal();renderResult();})();
+
+</script><script>
+/* V3.7 language UI layer. Underlying numeric calculations and saved PET data are not modified. */
+(function(){
+ const D={
+ 'Đầu Laser':'Laser head','Không kết nối máy Laser':'Not connected to Laser',
+ 'Nhập dữ liệu PET':'Import PET data','Nhập Nominal chuẩn':'Set nominal','Trung bình & Sai lệch':'Average & Deviation',
+ 'Bản đồ & Ổn định':'Heatmap & Stability','Nominal 8 lỗ':'8-hole Nominal','Laser Offset':'Laser Offset',
+ 'Dashboard tổng hợp theo đầu Laser':'Laser Head Overview Dashboard',
+ 'Ngưỡng CA tối đa (°) — đánh giá |CA|':'CA upper limit (°) — using |CA|',
+ 'Ngưỡng FAI1 tối đa (mm) — đường kính':'FAI1 upper diameter limit (mm)',
+ 'FAI2 ± (mm) — từng ΔX và ΔY':'FAI2 ± tolerance (mm) — each ΔX and ΔY',
+ 'Lưu ngưỡng kiểm soát':'Save control limits',
+ 'OK khi nhỏ hơn ngưỡng; bằng hoặc lớn hơn ngưỡng là NG.':'OK when below limit; NG at or above limit.',
+ 'Phạm vi':'Scope','Toàn bộ PET chưa xóa':'All retained PETs','PET mới nhất':'Latest PET',
+ 'Đầu Laser':'Laser head','Số PET':'PET count','CA trung bình':'Mean CA','CA nhỏ nhất':'Minimum CA','CA lớn nhất':'Maximum CA',
+ 'FAI1 · Đường kính trung bình của 8 lỗ':'FAI1 · Mean diameter of 8 holes',
+ 'FAI2 · Trung bình vị trí của 8 lỗ':'FAI2 · Mean position of 8 holes',
+ 'Trung bình 81 tọa độ từ các PET đã nhập':'Average of 81 positions across imported PETs',
+ 'Nhập nhiều PET (FAI9 × 81)':'Import multiple PETs (FAI9 × 81)',
+ 'Thiết lập Target Nominal X/Y — 88 điểm (81 FAI9 + 7 FAI15/FAI16/O4/O5)':'Set target X/Y nominal — 88 points (81 FAI9 + 7 references)',
+ 'Heat Map theo trục':'Heatmap axis','Heat map sai lệch 81 điểm':'81-point deviation heatmap',
+ 'Phân tích PET':'PET analysis','Chưa có PET.':'No PET data.','Chưa có dữ liệu':'No data',
+ 'Thấp':'Low','Cao':'High','Lỗ':'Hole','Số đo':'Measurements','Kết quả':'Result',
+ 'Số PET':'PET count','Số PET chưa xóa':'Retained PETs','Sao chép 81 dòng X/Y':'Copy 81 X/Y rows',
+ 'Sao chép bảng đầy đủ':'Copy full table','Dung sai TP2D (mm)':'TP2D tolerance (mm)',
+ 'Ngưỡng dao động σ X hoặc Y (mm)':'X/Y variability σ threshold (mm)',
+ 'Cập nhật':'Update','Điểm':'Point','Đánh giá':'Evaluation',
+ 'Mean Actual X':'Mean Actual X','Mean Actual Y':'Mean Actual Y',
+ 'Dao động cao':'High variation','Trong ngưỡng':'Within limit','Đã lưu Nominal đã sửa':'Nominal saved',
+ 'Lấy Nominal từ PET đầu (tham khảo)':'Use first PET nominal (reference)',
+ 'Sao chép Target X/Y':'Copy Target X/Y','Lưu Nominal đã sửa':'Save nominal edits',
+ 'Kiểm tra & áp dụng 88 điểm':'Validate & apply 88 points',
+ 'Kiểm tra & áp dụng 81 điểm':'Validate & apply 81 points',
+ 'Xóa nội dung dán':'Clear pasted content','Lấy Nominal FAI2 từ PET đầu':'Get FAI2 nominal from first PET',
+ 'Áp dụng 8 Nominal':'Apply 8 nominal coordinates','Xuất CSV Offset':'Export offset CSV',
+ 'Sao chép đầy đủ 88 điểm':'Copy all 88 points',
+ 'Sao chép Offset 81 điểm (X/Y)':'Copy 81 offset X/Y pairs',
+ 'PET cuối cùng':'Latest PET','không có thời gian':'no timestamp',
+ 'Điểm phụ 82–88: FAI15 / FAI16 / O5 / O4 (O5 và O4 là điểm gốc, mặc định X=0 và Y=0)':'Auxiliary points 82–88: FAI15 / FAI16 / O5 / O4 (O5 and O4 are zero origins)',
+ 'Áp dụng Actual của 7 điểm phụ cho PET mới nhất':'Apply auxiliary Actual values to latest PET',
+ 'Trên':'Above','Trái':'Left','Nhấn một điểm để xem chi tiết.':'Click a point for details.',
+ 'Min':'Min','Max':'Max','Mean diameter':'Mean diameter','Mean X':'Mean X','Mean Y':'Mean Y',
+ 'Số PET':'PET count','Số đo':'Samples','PET vị trí':'PET position',
+ 'CA dùng đơn vị góc độ gốc (độ); FAI1/FAI2 dùng mm.':'CA uses angular degrees; FAI1/FAI2 use mm.',
+ 'Vị trí dao động nhiều nhất':'Highest-variation points',
+ 'Xu hướng ΔX / ΔY theo thứ tự PET':'ΔX / ΔY trend by PET order',
+ 'Bản đồ sai lệch 81 điểm':'81-point deviation heatmap',
+ 'Sao lưu JSON':'Backup JSON','Khôi phục JSON':'Restore JSON',
+ 'Chọn file CSV':'Select CSV files','Thêm PET':'Add PET',
+ 'Nạp PET mẫu':'Load sample PET','Xóa PET đã bỏ chọn':'Delete unchecked PETs',
+ 'Xóa tất cả PET':'Delete all PETs','Chưa nhập thêm dữ liệu.':'No new data imported.',
+ 'Chưa có PET được chọn.':'No selected PETs.',
+ 'Tất cả PET':'All PETs','PET mới nhất':'Latest PET',
+ 'Không lưu được dữ liệu trình duyệt. Hãy sao lưu JSON:':'Could not save browser data. Back up JSON:',
+ 'Ngưỡng phải lớn hơn 0':'Limits must be greater than zero',
+ 'Hãy nhập PET và đủ 81 Nominal chuẩn':'Import PET data and all 81 nominal coordinates',
+ 'không tự động là chiều offset máy Laser':'does not automatically determine the Laser offset direction',
+ 'Đây là kết quả phân tích':'This is an analysis result',
+ 'Tọa độ trung bình là':'Average coordinates are',
+ 'Actual trung bình của từng điểm':'the mean Actual for each point',
+ 'trên các PET được chọn. Nominal mục tiêu do người dùng nhập riêng.':'across selected PETs. Target nominal is defined separately.',
+ 'ΔY tương tự':'the same applies to ΔY',
+ 'Trung bình':'Average','Tọa độ':'Coordinates','Ngoài ngưỡng':'Out of tolerance',
+ 'Giới hạn':'Limit','Dán trực tiếp từ Excel tại đây':'Paste from Excel here',
+ 'Nhập Nominal':'Enter nominal','Xuất CSV':'Export CSV',
+ 'Áp dụng':'Apply','Xóa':'Delete','Đã thêm':'Added','Lỗi':'Error',
+ 'Điểm phụ':'Auxiliary points','Dữ liệu được lưu trên trình duyệt của máy đang dùng.':'Data is stored in this browser.',
+ 'Nên sao lưu JSON.':'Back up JSON regularly.',
+ 'Line':'Line',
+ };
+ const phrases=Object.entries(D).sort((a,b)=>b[0].length-a[0].length);
+ const saved=new WeakMap(),attrs=new WeakMap();
+ const skip=n=>n.parentElement&&n.parentElement.closest('script,style,svg,textarea,option[value=""],.code');
+ function trans(str){let out=str;for(const [vi,en] of phrases){ if(out.includes(vi))out=out.split(vi).join(en); }return out;}
+ function sync(root=document){const en=localStorage.getItem('PET81_uiLang')==='en';document.documentElement.lang=en?'en':'vi';
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=walker.nextNode())){if(skip(n)||!n.nodeValue.trim())continue;let original=saved.get(n);if(original===undefined){original=n.nodeValue;saved.set(n,original)}else if(n.nodeValue!==original&&n.nodeValue!==trans(original)){original=n.nodeValue;saved.set(n,original)}const desired=en?trans(original):original;if(n.nodeValue!==desired)n.nodeValue=desired;}
+  root.querySelectorAll?.('input[placeholder],textarea[placeholder],button[title]').forEach(el=>{for(const a of ['placeholder','title']){if(!el.hasAttribute(a))continue;const key=a+'Original';if(!el.dataset[key])el.dataset[key]=el.getAttribute(a);el.setAttribute(a,en?trans(el.dataset[key]):el.dataset[key]);}});
+  document.getElementById('langVI')?.classList.toggle('selected',!en);document.getElementById('langEN')?.classList.toggle('selected',en);
+  document.getElementById('langVI')?.setAttribute('aria-pressed',String(!en));document.getElementById('langEN')?.setAttribute('aria-pressed',String(en));
+ }
+ let busy=false;
+ const observer=new MutationObserver(()=>{if(busy)return;busy=true;observer.disconnect();try{sync()}finally{observer.observe(document.body,{subtree:true,childList:true,characterData:true});busy=false}});
+ ['VI','EN'].forEach(code=>document.getElementById('lang'+code).addEventListener('click',()=>{localStorage.setItem('PET81_uiLang',code==='EN'?'en':'vi');observer.disconnect();sync();observer.observe(document.body,{subtree:true,childList:true,characterData:true})}));
+ // Guard modal prompts so English-speaking users can use the existing workflows.
+ const nativeAlert=window.alert.bind(window),nativeConfirm=window.confirm.bind(window);
+ window.alert=s=>nativeAlert(localStorage.getItem('PET81_uiLang')==='en'?trans(String(s)):s);
+ window.confirm=s=>nativeConfirm(localStorage.getItem('PET81_uiLang')==='en'?trans(String(s)):s);
+ sync();observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+})();
+</script></body></html>
